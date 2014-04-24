@@ -26,9 +26,9 @@ NULL
 
 #=====  Helper Funcs for work with code and file system  =====
 
-# TODO: TBD
-#if(!require(HaLaP)) stop('package HaLaP is required')   # if executed after, overwrites source('zBase')
-#if(!exists('theFile')) theFile= 'You need assign theFile <- (full path to the file)'
+# TODO: side effect: global theFile
+if(!require(HaLaP)) stop('package HaLaP is required')   # if executed after, overwrites source('zBase')
+if(!exists('theFile')) theFile= 'You need assign theFile <- (full path to the file)'
 
 # from HaLaP
 prr= function(x, ma='', header=T) {if(header)catf('\n&&& %s == %s ==\n', ma, deparse(substitute(x))); ns= na(x)
@@ -36,6 +36,7 @@ prr= function(x, ma='', header=T) {if(header)catf('\n&&& %s == %s ==\n', ma, dep
 	for(xx in if(is.null(ns)) 1:le(x) else ns) catf('%3s= %s\n', xx,  x[[xx]]); catt('-------------------------\n')}
 
 cn= function(cnn,  sep='[ ,\n\t\\+]+') unlist(strsplit(cnn, sep))
+
 
 getQuoteCommentStatusA= function(s, verb=F) {
 	sOut= ss= strsplit(pas(s, '', '\n'), '')[[1]]  # vector of symbols
@@ -513,23 +514,24 @@ createRWJalbum= function(RWJournals, fout= '../all.Pic.htm', outSuffix= attr(.re
 # createRWJalbum(RWJournals.42b, fout='../RAlbum.42b.htm', outSuffix='.htm')
 
 
+#e gff('IPH2ClickCountThreshold *=', 'OUTPUT|@EnableDebugg', f="M:/73_ShivaAegisAdjust/AegisCustomDataSourceView.templ-J.script")
 gff= function(patt=' ===', pattNeg='gff', f= theFile, withLineNumb= T){ # grep pattern in the file
 	catt(3099,'============================ gff:', f)
 	s= readLines(f, warn=F)
 	ii= grepl(patt, s) & !grepl(pattNeg, s)
 	x<- sf('%4s %s', if(withLineNumb) 1:le(s) %+% '.' else '', sub('^\\s*', '',s))[ii]
-	prr(x,,F)
-	invisible(x)   #ex: gff('IPH2ClickCountThreshold *=', 'OUTPUT|@EnableDebugg', f="M:/73_ShivaAegisAdjust/AegisCustomDataSourceView.templ-J.script")
+	prr(x)
+	invisible(s[ii])   
 }
 
 #' set of funcs to extract regex, wrappers for regexpr
 #e rege('b.', cn('abcd xy 23b67b8'))
 # [1] "bc" ""   "b6"
-#rege= function(patt, x) {y=regexpr(patt, x, 1);  substr(x, y, y + attr(y, "match.length")-1)}
-
 # or
 #e rege('b.', cn('abcd xy 23b67b8'))
 # [1] "bc" ""   "b6"
+
+#rege= function(patt, x) {y=regexpr(patt, x, 1);  substr(x, y, y + attr(y, "match.length")-1)}
 rege= function(patt, x) {yy= regexec(patt, x, 1); laply(seq_along(yy), function(i){y=yy[[i]][1]; substr(x[i], y, y + attr(yy[[i]], "match.length")[1]-1)})}
 
 #'   wrappers for regexpr
@@ -540,11 +542,9 @@ rege= function(patt, x) {yy= regexec(patt, x, 1); laply(seq_along(yy), function(
 # "" 
 grege1= function(patt, x) {yy= gregexpr(patt, x, 1)[[1]];  laply(seq_along(yy), function(i){y=yy[i];  substr(x, y, y + attr(yy, "match.length")[i]-1)})}
 
+#e grege('b.', cn('abcd xy 23b67b8 absbeb3'))
 # nOK grege= function(patt, x) {yy= gregexpr(patt, x); str(yy); llply(yy, function(z)laply(seq_along(z), function(i){y=z[i];  substr(x, y, y + attr(z, "match.length")[i]-1)}))}
-
 grege= function(patt, x) llply(x, function(z)grege1(patt, z))
-# grege('b.', cn('abcd xy 23b67b8 absbeb3'))
-
 
 
 #= sub ... in file, used by CreateProj =
@@ -621,13 +621,13 @@ CreateProj= CreateProject= CreateNewProj= function(newProj.name= 'newProjTemplNa
 	gw()
 	
 
-	for(f in dir(Templ.dir,  patt='newProjTemplName.*')){
+	for(f in dir(Templ.dir,  patt='newProjTemplName.*|README.*')){
 		catt(60, f, sf('%s/%s/%s', root, newProj.name, sub('zz', newProj.name, f)))
 		#file.copy(fp(Templ.dir,f), gw())
 		catt('f=', f)
 		#if(grepl('zz', f)) fsub(fin= f
-		if(grepl('newProjTemplName', f) & !grepl('doc.?$', f)) {
-			fsub(fin= fp(Templ.dir,f)
+		if(grepl('newProjTemplName|README', f) & !grepl('doc.?$', f)) {catt('fsub')
+			fsub(fin= fp(Templ.dir, f)
 						, fout= sub('newProjTemplName', newProj.name, f)
 						, fileShow= F, overOut=overOut
 						#, zzz= sf('m:/%s/%1$s\\.r', newProj.name)
@@ -845,7 +845,119 @@ getQuoteCommentStatus= function(s, verb=F) {
 	#pas(states)
 	pas(sOut, '', '')
 }
+
+
+
+#' get status for single, double quotes, backticks - single symbol on the line
+#e s2= getQuoteCommentStatus(s= c('1abs#bb\n2#a"cc"\n3aa"bb#cc\n4`aa"b`b', '5aa"bb#cc\n6a\'aa#"bb')); prr(s2)
+if (0) {
+	s= readLines(textConnection(' x=1
+							
+							"bb
+							"
+							y=0
+							z=3
+							"
+							# aa
+							# bb"
+					"abc"
+							
+							'))
+}
+ccc= parse.single.line.quotes= function(file=theFile, s=readLines(file), verb=F, exec=T) {
+		#sing.quo= gregexpr('^\\s*([\'"`])\\s*$', s)
+		sing.quo= regexpr('^\\s*([\'"`])\\s*$', s)
+		if (0) {
+			state02=ifelse(sing.quo==1, substr(s, attr(sing.quo,"match.length"), attr(sing.quo,"match.length")), '')
+			state.text= (sing.quo==1)
+			state.text= 0+ grepl('^\\s*([\'"`])\\s*$', s)
+			state.text= cumsum(sing.quo==1)%%2
+			
+			s= gsub('\t','    ', s)
+			ident= regexpr('\\S', s) - 1 
+			
+			
+			s3= s %+% ifelse(sing.quo>0, ifelse(ichunk %%2, '</code></pre>\n\n', '\n<pre><code>\n'), ''); prr(s3)
+			
+			s3=c( '<html>\n<pre><code>\n', s %+% ifelse(sing.quo>0, ifelse(ichunk %%2, '</code></pre>\n\n', '\n<pre><code>\n'), ''), '</code></pre></html>\n\n')
+			s3=c( '\n<pre><code>\n', s %+% ifelse(sing.quo>0, ifelse(ichunk %%2, '</code></pre>\n\n', '\n<pre><code>\n'), '')
+					, '</code></pre>\n\n')
+			
+			gw()
+			htm= markdownToHTML(text= s3, fragment.only=F)  ; prr(htm)
+			markdownToHTML(output='zz.htm', text= s3, fragment.only=F)
+			cat(htm, file='zz.htm')
+			expl('zz.htm')
+			file.remove('zz.htm')		
+		}
+		s= gsub('\t','    ', s)
+
+		ichunk= cumsum(grepl('^\\s*([\'"`])\\s*$', s))
+		u= df(sing.quo, ichunk, style=ifelse(ichunk %%2, 'md', 'r')
+		   , ident= regexpr('\\S', s) - 1
+		   , ident1= attr(sing.quo,"match.length")-1, s)
+		
+
+		s2= split(s, ichunk)
+		u2= split(u, ichunk)
 	
+		s4= list()
+		for(i in 1:le(s2)){ # i=3
+			if(i%%2==1){#  R code
+				#s4[[i]]= c('\n<pre><code>\n', s2[[i]]) # r code
+				s4[[i]]= markdownToHTML(text= c('', '    ' %+% s2[[i]], ''),  fragment.only=F) # r code
+			} else{ 
+				minide=max(0, min(u2[[i]]$ident))
+				txt= substr(s2[[i]][-1], minide+1, 999)
+				ides= pas(rep(' ', minide))
+				htm= ides %+% markdownToHTML(text= txt, fragment.only=T)
+				s4[[i]]= c(s2[[i]][1], '\n</code></pre>\n\n', htm) 
+			}
+		}
+		
+		#s4= markdownToHTML(text= s %+% '\n', fragment.only=F) #xxx !!!
+		s5= c('<html>', unlist(s4) %+%  '\n', '</html>'); if( verb) prr(s5)
+		if (exec) {
+			cat(s5, file='zz.htm')
+			expl('zz.htm')
+			#file.remove('zz.htm')
+		}
+		attr(s5, 'detailes')= u
+		invisible(s5)
+}
+# u= parse.single.line.quotes(file=theFile, verb=F, exec=T)
+gw()
+
+
+ccc2= parse.terminal.line.quotes2= function(file=theFile, s=readLines(file), verb=F, exec=T) {
+	#sing.quo= gregexpr('^\\s*([\'"`])\\s*$', s)
+	s= gsub('\t','    ', s)
+	sing.quo= regexpr('^\\s*([\'"`])\\s*$', s)
+	start.q= gre2('^\\s*[\'"`]', '^([\'"`]).*\\1', s, v=F)
+	end.q= gre2('[\'"`]\\s*$', '([\'"`]).*\\1$', s, v=F)
+	ich= cumsum(end.q | start.q)
+	#df(start.q, end.q, ich=cumsum(start.q + end.q), s)
+	#s2= ifelse(start.q, "</code>",'') %+% s %+% ifelse(end.q, "<code>",'')
+	#s2= ifelse(start.q, "```\n",'') %+% ifelse(ich%%2, '', '    ') %+%  s %+% ifelse(end.q & !start.q, "\n```",'')
+	#s2= ifelse(start.q, "`\n",'') %+% ifelse(ich%%2, '', '\t') %+%  s %+% ifelse(end.q & !start.q, "\n`",'')
+	s2= ifelse(start.q, "</code></pre>\n",'') %+% ifelse(ich%%2, '', '\t') %+%  s %+% ifelse(end.q & !start.q, "\n<pre><code>",'')
+	#s2= ifelse(ich%%2, '', '\t') %+%  s 
+	#s3= c("`\n", s2, "`\n\n") %+% '\n'
+	s3= c("<pre><code>\n", s2, "</code></pre>\n\n") %+% '\n'
+	#s3= s2 #c("```\n", s2, "\n```\n") %+% '\n'
+	gw()
+	# gw: sw("");  expl()
+	
+	
+	
+	cat(s3, file='m:/62_MM_dispos/out/zz.md')
+	markdownToHTML('m:/62_MM_dispos/out/zz.md', 'zz.htm', fragment.only=F)
+	expl('zz.htm')
+	
+	#execf('d:/z/arc/MultiMarkdown-Windows-Portable-4.3.1/multimarkdown.exe "m:/62_MM_dispos/out/zz.md" >> m:/62_MM_dispos/out/zz.htm')
+	#expl('zz.htm')
+	
+}
 
 # do we need  HHInit ??
 #' wrapper for dev.print  -  save graphics to .png file

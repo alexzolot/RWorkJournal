@@ -2,9 +2,13 @@
 \alias{gff}
 \title{gff}
 \usage{
-gff(patt = " ===", pattNeg = "gff", f = theFile, withLineNumb = TRUE)
+gff(patt = " ===", pattNeg = "gff", f = get.theFile(),
+  withLineNumb = TRUE)
 }
 \description{
-gff
+grep pattern in the file
+}
+\examples{
+gff('= func',  '^\\\\s*#',  f=system.file('rcode/WorkJournal.r',  package ='WorkJournal'))
 }
 

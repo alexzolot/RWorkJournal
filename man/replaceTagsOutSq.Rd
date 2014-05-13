@@ -9,6 +9,6 @@ for Code2HTML: prevent < and > in R code render as HTML
 tags.
 }
 \examples{
-s= replaceTagsOutSq(c(" <aa '<bb'   `<ee`  <cc", " <aa '<bb'   `<ee`  <cc")); prr(s)
+s= replaceTagsOutSq(c(" <aa '<bb'   `<ee`  <cc",  " <aa '<bb'   `<ee`  <cc")); prr(s)
 }
 

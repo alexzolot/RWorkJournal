@@ -8,6 +8,6 @@ rege(patt, x)
 set of funcs to extract regex, wrappers for regexpr
 }
 \examples{
-rege('b.', cn('abcd xy 23b67b8'))
+rege('b.',  cn('abcd xy 23b67b8'))
 }
 

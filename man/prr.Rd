@@ -5,6 +5,6 @@
 prr(x, ma = "", header = TRUE)
 }
 \description{
-Created : 2013-06-24 02:55:55 License : GPL-2
+Created : 2013-06-24 02:55:55
 }
 

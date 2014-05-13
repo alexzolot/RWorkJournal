@@ -8,6 +8,6 @@ grege1(patt, x)
 wrappers for regexpr
 }
 \examples{
-grege1('b.', 'abcdbnm')
+grege1('b.',  'abcdbnm')
 }
 

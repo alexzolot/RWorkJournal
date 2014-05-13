@@ -5,10 +5,15 @@
 \title{CreateProj= CreateProject= CreateNewProj}
 \usage{
 CreateProj(newProj.name = "newProjTemplName",
-  Templ.dir = "TRUE:/work/UseR-2013/99_commonR/newProjTemplName",
-  root = "TRUE:/work/UseR-2013", R2wd = FALSE, overOut = FALSE)
+  Templ.dir = system.file("newProjTemplName", package = "WorkJournal"),
+  root = gw(), R2wd = FALSE, overOut = FALSE)
 }
 \description{
-CreateProj= CreateProject= CreateNewProj
+Create New Project from template
+}
+\examples{
+\dontrun{
+  CreateNewProj(newProj.name= '96_aaaa',  root='../../')
+}
 }
 

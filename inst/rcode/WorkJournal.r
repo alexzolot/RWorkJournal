@@ -5,9 +5,9 @@
 #' @description R Work Journal and Helper Funcs for work with code and file system
 #' for a book "Handling Large R Projects"
 #' 
-#' abbreviations: ds - dataset, patt - pattern, pattNeg - negative pattern,  #e - example 
+#' abbreviations: ds - dataset, patt - pattern, pattNeg - negative pattern,  #e - example,  #en - example \notrun
 #' @author Alex Zolotovitski <alex@@zolot.us>
-# @license GPL-2  
+#' License: GPL-2  
 
 #' @keywords aliases
 
@@ -18,17 +18,14 @@
 NULL
 
 
-
-
 #' Created  : 2013-06-24 02:55:55
-#' License  : GPL-2  
 
 
 #=====  Helper Funcs for work with code and file system  =====
 
-# TODO: side effect: global theFile
-if(!require(HaLaP)) stop('package HaLaP is required')   # if executed after, overwrites source('zBase')
-if(!exists('theFile')) theFile= 'You need assign theFile <- (full path to the file)'
+# !exists('hee') || !exists('sw') && require(HaLaP) || stop('package HaLaP is required')   # if executed after, overwrites source('zBase')
+# !exists('libra') || !exists('sw') || stop('package HaLaP is required')   # if executed after, overwrites source('zBase')
+
 
 # from HaLaP
 prr= function(x, ma='', header=T) {if(header)catf('\n&&& %s == %s ==\n', ma, deparse(substitute(x))); ns= na(x)
@@ -36,6 +33,10 @@ prr= function(x, ma='', header=T) {if(header)catf('\n&&& %s == %s ==\n', ma, dep
 	for(xx in if(is.null(ns)) 1:le(x) else ns) catf('%3s= %s\n', xx,  x[[xx]]); catt('-------------------------\n')}
 
 cn= function(cnn,  sep='[ ,\n\t\\+]+') unlist(strsplit(cnn, sep))
+
+#' wrapper for paste
+'%+%' = paste0 #function(x, y) paste(x, y, sep= "")
+
 
 
 getQuoteCommentStatusA= function(s, verb=F) {
@@ -97,8 +98,191 @@ getQuoteCommentStatusA= function(s, verb=F) {
 }
 
 
+{ # header.jQuery, footer  for cc()
+	header.jQuery= c('<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"><head><link rel="shortcut icon" href="">
+					
+					<!-- we need these 2 lines for the case if no Internet during the tutorial to get local js -->
+					<script src="T:/mathjax-MathJax-v2.2-8-g727332c/mathjax-MathJax-727332c/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+					<script src="T:/work/UseR-2013/lib/jquery-1.10.1.min.js"></script>
+					<!--  -->
+					
+					<script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+					<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+					
+					
+					<!--script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.js"></script-->
+					
+					<script type="text/x-mathjax-config">  MathJax.Hub.Config({ tex2jax: { inlineMath: [[" $ "," $ "]] } }) </script>
+					
+					<!-- script>http://zolot.us/favicon.ico
+					$(function(){
+					//$(".imgGal").draggable() ; //.parent().resizable();
+					$(".dimg").resizable().draggable(); 
+					// $(".pic").draggable();  //.resizable();;
+					});
+					</script -->
+					
+					
+					<script>
+					$(function(){
+					var d= document
+					
+					//var imgFold= "<img src=\'https://ui.netbeans.org/docs/ui/code_folding/cf_minus.gif\'/>"  // "(-)"
+					var imgFold= $(".aD:first").html()
+					
+					$("img.imgGal")
+					.mouseover(function() {show(this)} )
+					.mouseout(function() {show(0)} )
+					.click(function() {goto(this.id.replace("tn",""))})
+					.dblclick(function() {ShowImg(this.name.replace(/\\..*/, ""),  this.name.replace(/.*?\\./, "")); })
+					;
+					$(".aD").click(function() { th= $(this)
+					th.next("div").toggle();
+					//alert(th.html()+ "\\n" + imgFold)
+					
+					th.html(th.html()== imgFold ? "..." : imgFold)
+					})
+					$("#aToggleAll").click(function() {th= $(this)
+					if( th.text() =="(+)") {
+					$("div").show(); th.html(imgFold); $("a:not(.comments)").html(imgFold)   
+					} else { $("div").hide(); th.html("(+)"); $("a:not(.comments)").html("(+)")}
+					})
+					//   $(".aToggleAllPic").click(function() {$("img").toggle() })
+					
+					function toggleD(a, a2, di){ if( a.text() == "(+)") {
+					di.show(); a.html(imgFold); a2.html(imgFold)  
+					} else { di.hide(); a.html("(+)"); a2.html("...")}
+					}
+					
+					function ToggleComments2(){ 
+					var tt = document.getElementsByClassName("comment2"); 
+					var t0= tt[0].style.fontSize;
+					di= (t0 == "3px" || t0 == "") ? "12px" : ((t0 == "12px")? "1px" : "3px") ;
+					fc=  di == "1px" ? "white" : "green";
+					for (var i = 0; i < tt.length; i++) {tt[i].style.fontSize = di; tt[i].style.color=fc;}
+					}
+					
+					$(".aToggle.DD1").click(function() {toggleD($(this), $(".H1 + + .aD"), $(".D1")) })
+					$(".aToggle.DD2").click(function() {toggleD($(this), $(".H2 + + .aD"), $(".D2")) })
+					$(".aToggle.DD3").click(function() {toggleD($(this), $(".H3 + + .aD"), $(".D3")) })
+					$(".aToggle.DD4").click(function() {toggleD($(this), $(".H4 + + .aD"), $(".D4")) })
+					$(".aToggle.TOC").click(function() {toggleD($(this), $(".zz"), $("div.TOC")) })
+					$(".aToggleAllPic").click(function() {toggleD($(this), $(".zz"), $("img")) })
+					$(".aToggleComments").click(function() {
+					ToggleComments2(); return;
+					
+					c2= $(".comment2");	fs= c2.eq(0).css("font-size");
+					var tt = document.getElementsByClassName("comment2"); var t0= tt[0].style.fontSize;
+					//alert(fs + " | " + tt[0].innerHTML + " zz " + t0)
+					//alert(fs + " | " + t0.innerHTML)
+					//fsn= (fs == "3px" || fs == "") ? "12px" : ((fs == "12px")? "1px" : "3px");
+					fsn= (fs == "30px" || fs == "") ? "120px" : ((fs == "120px")? "10px" : "30px");
+					//alert(fs + " | " + tt[0].innerHTML + " t0: " + t0 + " fsn:" + fsn+ "|"+ " sp:" + $(".comment2:first + span").text())
+					$("#out").text(" || fs:" +fs + " | " + tt[0].innerHTML + " t0: " + t0 + " fsn:" + fsn+ "|"+ " sp:" + $(".comment2:first + span").text());
+					$(".comment2").css({"font-size": fsn, "font-size-adjust": .1});
+					//$(".comment2").css("font-size", "xx-small");
+					$(".comment2").text("zz");
+					$(".comment2").css("color",  c2.css("font-size")== "1px" ? "white" : "green")
+					})
+					
+					});
+					</script>
+					
+					<script><!--
+					var d= document;
+					
+					function goto(i) {w= d.location= "#" + i;}
+					
+					function ShowSVG(p){w= window.open("","","fullscreen=yes")
+					w.document.write("<html><iframe src=\'./img/"  + p + ".svg\' width=1200  height=800/></html>")
+					w.focus()
+					}
+					
+					function ShowImg(p, capt){w= window.open("","","type=fullWindow,fullscreen,location=\'\',height="+ screen.height+ ",width="+screen.width)
+					w.document.write("<html><img src=\'./img/"  + p + ".png \' /><br/>" + p +  capt + "</html>")
+					w.document.title= p + capt;
+					w.focus()
+					}
+					
+					function resize(i) {e=d.getElementById(i); w= e.width;
+					e.style.width= (w==700)? 1000 :  (w==1000)? 1200 : (w==1200)? "100%" : 700;
+					}
+					
+					
+					function ToggleFold(d) {}
+					
+					
+					function show(e){
+					$("#show").css({display : (e==0)? "none" : "block", border: (e==0)? "0" : "2px solid blue"})
+					
+					if(e != 0){
+					x= Math.min(e.offsetLeft+ e.width + 10, 500) //x= e.x+ e.width + 10;// ; if(x > 500) x= 500;
+					y= e.offsetTop+ e.height + 10               //y= e.y+ e.height + 10
+					
+					$("#show").css({left: x, top: y})
+					$("#showPic").attr("src", e.src)
+					$("#showTxt").html("<br/>" +  e.name)  //  +  e.alt)
+					
+					/* show properties of e 
+					a=""
+					for(k in e) if(1 || e[k] > 10 && e[k]+" " < "a") a= a + "      e[" + k + "]= " + e[k];
+					alert (a);
+					/**/
+					
+					};
+					}
+					
+					//--></script>
+					
+					<style>  /*  www.w3schools.com/cssref/css_colornames.asp  www.tizag.com/cssT/border.php */
+					div.main {font-family: monospace; white-space: pre;}
+					.D1, .D2, .D3, .D4, .D5  {background-color:rgba(255,240,240, .2); border-style:ridge; margin:5px; padding:15px;-moz-border-radius:5px; border-radius:5px} /*div {; opacity: 0.3; background-color:GhostWhite; border-left-style:ridge;}  */
+					div.TOC {background-color:rgb(248,248,255); }	
+					div.D5 {font-size:8px;} 
+					//.sq {font-size:12px; font-family: Arial; color:DodgerBlue } 
+					center, .capt {font-size:12px; font-weight:bold; font-family: Arial; margin:auto; text-align:center;}
+					.captTOC {font-size:12px; font-weight:bold; font-family: Arial; align:left}
+					H1,  H2,  H3,  H4,  H5 {color:blue; font-family: Arial; color:teal;}
+					.H1, .H2, .H3, .H4, .H5 {color:teal; font-family: Arial; font-weight:bold;  display:inline-block; display:-moz-inline-box;}
+					H1, .H1 {font-size:36px;  margin-top:36px;  margin-bottom:8px;  margin-left:0px; } 
+					H2, .H2 {font-size:28px;  margin-top:28px;  margin-bottom:5px;  margin-left:20px;} 
+					H3, .H3 {font-size:24px;  margin-top:15px;  margin-bottom:3px;  margin-left:40px;}
+					H4, .H4 {font-size:18px;  margin-top:12px;  margin-bottom:2px;  margin-left:60px;}
+					H5, .H5 {font-size:14px;  margin-top:10px;  margin-bottom:1px;  margin-left:80px;}
+					img.pic, .captTOC, img.tnTOC {margin-top:0px;   margin-bottom:0px;  margin-left:10px;} //80px;}
+					span.captTOC, img.tnTOC { display: block;}
+					.D77 { display:inline; }
+					img, .aD, iframe {border-style:none; border:0}
+					/* .dimg{height:90px;  display:inline-block;} /* position:fixed;  position:absolute;*/ 
+					.imgGal{margin-top:1px;   margin-bottom:1px;  margin-left:1px; height:100px} /*height:100%; max-width:100%; max-height:100%; }/* position:absolute; fixed;*/ 
+					
+					.fun {color:indigo; font-weight:bold;}
+					.comment {color:green; align:left}
+					.comment2 {color: rgb(100,200,100); font-size:3px; -webkit-text-size-adjust: none;}
+					.text, .sq {color: teal; font-size:12px;}
+					</style>
+					</head><body>') 
+			
+			footer=	'<div id= "show" style= "position: absolute; left:-1000px; top:1px; border:solid blue; padding:5; display:none; background-color:white; -moz-border-radius: 10px; border-radius: 10px;">
+					<img id="showPic" src="" height="400px" style="left:0px"/><br/>
+					<span id="showTxt"></span>
+					</div></body></html>'
+			
+			
+}
 
-ccm= code2HTML.md=  function(.theFile= theFile, img='img', FullSyntaxHighlight= FALSE
+
+#'  get global variable or option "theFile"
+#en get.theFile() 
+get.theFile= function() {
+	tf= if(exists('theFile', envir= .GlobalEnv)) {get('theFile', envir= .GlobalEnv)
+			} else getOption('theFile')
+	is.null(tf) && stop('RWJ: Set  options(theFile= "full path to the file")')
+	tf
+}
+
+
+ccm= code2HTML.md=  function(.theFile= get.theFile(), img='img', FullSyntaxHighlight= FALSE
 		, classicHeaders=FALSE, show=TRUE, toSave=TRUE, outSuffix='.htm') {
 	s1= readLines(.theFile, warn=F)
 	libra(markdown)  # http://daringfireball.net/projects/markdown/basics
@@ -141,7 +325,7 @@ ccm= code2HTML.md=  function(.theFile= theFile, img='img', FullSyntaxHighlight= 
 }
 #ccm()
 
-cc= code2HTML= code2HTMLjQuery= function(.theFile= theFile, img='img', FullSyntaxHighlight= FALSE
+cc= code2HTML= code2HTMLjQuery= function(.theFile= get.theFile(), img='img', FullSyntaxHighlight= FALSE
 								, classicHeaders=FALSE, show=TRUE, toSave=TRUE, outSuffix='.htm') {
 	if(FullSyntaxHighlight){   #== Full syntax highlight ==
 		catt('FullSyntaxHighlight')
@@ -234,177 +418,17 @@ cc= code2HTML= code2HTMLjQuery= function(.theFile= theFile, img='img', FullSynta
 	pics= laply(na(picss), function(np){p=  picss[[np]]; sf('<img id="tn%s" class="imgGal" src="img/%s.png" name="%s" height=100> '
 						, np, gsub('.* (Pic_[0-9]+).*', '\\1', p)
 						, gsub('# *', '', p))})
-	
-	header= c('<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"><head><link rel="shortcut icon" href="">
 
-				<!-- we need these 2 lines for the case if no Internet during the tutorial to get local js -->
-				<script src="T:/mathjax-MathJax-v2.2-8-g727332c/mathjax-MathJax-727332c/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-				<script src="T:/work/UseR-2013/lib/jquery-1.10.1.min.js"></script>
-				<!--  -->
-                
-				<script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-				<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+	#	    header.jQuery=....
+	#
+	#		footer=	'<div id= "show" style= "position: absolute; left:-1000px; top:1px; border:solid blue; padding:5; display:none; background-color:white; -moz-border-radius: 10px; border-radius: 10px;">
+	#				<img id="showPic" src="" height="400px" style="left:0px"/><br/>
+	#				<span id="showTxt"></span>
+	#				</div></body></html>'
+	#
+	#		
 
-
-				<!--script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.js"></script-->
-             
-				 <script type="text/x-mathjax-config">  MathJax.Hub.Config({ tex2jax: { inlineMath: [[" $ "," $ "]] } }) </script>
-				
-				<!-- script>http://zolot.us/favicon.ico
-					$(function(){
-					//$(".imgGal").draggable() ; //.parent().resizable();
-					$(".dimg").resizable().draggable(); 
-					// $(".pic").draggable();  //.resizable();;
-					});
-				</script -->
-				
-				
-				<script>
-				$(function(){
-					var d= document
-
-				//var imgFold= "<img src=\'https://ui.netbeans.org/docs/ui/code_folding/cf_minus.gif\'/>"  // "(-)"
-				var imgFold= $(".aD:first").html()
-
-				$("img.imgGal")
-					.mouseover(function() {show(this)} )
-					.mouseout(function() {show(0)} )
-				    .click(function() {goto(this.id.replace("tn",""))})
-	                .dblclick(function() {ShowImg(this.name.replace(/\\..*/, ""),  this.name.replace(/.*?\\./, "")); })
-				;
-				$(".aD").click(function() { th= $(this)
-				th.next("div").toggle();
-				//alert(th.html()+ "\\n" + imgFold)
-
-				th.html(th.html()== imgFold ? "..." : imgFold)
-				})
-                $("#aToggleAll").click(function() {th= $(this)
-		        if( th.text() =="(+)") {
-		        $("div").show(); th.html(imgFold); $("a:not(.comments)").html(imgFold)   
-		        } else { $("div").hide(); th.html("(+)"); $("a:not(.comments)").html("(+)")}
-                })
-                //   $(".aToggleAllPic").click(function() {$("img").toggle() })
-				
-				function toggleD(a, a2, di){ if( a.text() == "(+)") {
-				di.show(); a.html(imgFold); a2.html(imgFold)  
-				} else { di.hide(); a.html("(+)"); a2.html("...")}
-				}
-				
-				function ToggleComments2(){ 
-				var tt = document.getElementsByClassName("comment2"); 
-				var t0= tt[0].style.fontSize;
-				di= (t0 == "3px" || t0 == "") ? "12px" : ((t0 == "12px")? "1px" : "3px") ;
-				fc=  di == "1px" ? "white" : "green";
-				for (var i = 0; i < tt.length; i++) {tt[i].style.fontSize = di; tt[i].style.color=fc;}
-				}
-
-                $(".aToggle.DD1").click(function() {toggleD($(this), $(".H1 + + .aD"), $(".D1")) })
-                $(".aToggle.DD2").click(function() {toggleD($(this), $(".H2 + + .aD"), $(".D2")) })
-                $(".aToggle.DD3").click(function() {toggleD($(this), $(".H3 + + .aD"), $(".D3")) })
-                $(".aToggle.DD4").click(function() {toggleD($(this), $(".H4 + + .aD"), $(".D4")) })
-                $(".aToggle.TOC").click(function() {toggleD($(this), $(".zz"), $("div.TOC")) })
-                $(".aToggleAllPic").click(function() {toggleD($(this), $(".zz"), $("img")) })
-                $(".aToggleComments").click(function() {
-					ToggleComments2(); return;
-
-					c2= $(".comment2");	fs= c2.eq(0).css("font-size");
-					var tt = document.getElementsByClassName("comment2"); var t0= tt[0].style.fontSize;
-					//alert(fs + " | " + tt[0].innerHTML + " zz " + t0)
-					//alert(fs + " | " + t0.innerHTML)
-					//fsn= (fs == "3px" || fs == "") ? "12px" : ((fs == "12px")? "1px" : "3px");
-					fsn= (fs == "30px" || fs == "") ? "120px" : ((fs == "120px")? "10px" : "30px");
-					//alert(fs + " | " + tt[0].innerHTML + " t0: " + t0 + " fsn:" + fsn+ "|"+ " sp:" + $(".comment2:first + span").text())
-					$("#out").text(" || fs:" +fs + " | " + tt[0].innerHTML + " t0: " + t0 + " fsn:" + fsn+ "|"+ " sp:" + $(".comment2:first + span").text());
-					$(".comment2").css({"font-size": fsn, "font-size-adjust": .1});
-					//$(".comment2").css("font-size", "xx-small");
-					$(".comment2").text("zz");
-					$(".comment2").css("color",  c2.css("font-size")== "1px" ? "white" : "green")
-					})
-				
-				});
-				</script>
-				
-				<script><!--
-				var d= document;
-				
-				function goto(i) {w= d.location= "#" + i;}
-				
-				function ShowSVG(p){w= window.open("","","fullscreen=yes")
-				w.document.write("<html><iframe src=\'./img/"  + p + ".svg\' width=1200  height=800/></html>")
-				w.focus()
-				}
-			    
-				function ShowImg(p, capt){w= window.open("","","type=fullWindow,fullscreen,location=\'\',height="+ screen.height+ ",width="+screen.width)
-				w.document.write("<html><img src=\'./img/"  + p + ".png \' /><br/>" + p +  capt + "</html>")
-				w.document.title= p + capt;
-				w.focus()
-				}
-				
-				function resize(i) {e=d.getElementById(i); w= e.width;
-				e.style.width= (w==700)? 1000 :  (w==1000)? 1200 : (w==1200)? "100%" : 700;
-				}
-				
-				
-				function ToggleFold(d) {}
-				
-				
-				function show(e){
-				$("#show").css({display : (e==0)? "none" : "block", border: (e==0)? "0" : "2px solid blue"})
-				
-				if(e != 0){
-                x= Math.min(e.offsetLeft+ e.width + 10, 500) //x= e.x+ e.width + 10;// ; if(x > 500) x= 500;
-                y= e.offsetTop+ e.height + 10               //y= e.y+ e.height + 10
-				
-				$("#show").css({left: x, top: y})
-				$("#showPic").attr("src", e.src)
-				$("#showTxt").html("<br/>" +  e.name)  //  +  e.alt)
-				
-				/* show properties of e 
-				a=""
-				for(k in e) if(1 || e[k] > 10 && e[k]+" " < "a") a= a + "      e[" + k + "]= " + e[k];
-				alert (a);
-				/**/
-			
-				};
-				}
-				
-				//--></script>
-				
-				<style>  /*  www.w3schools.com/cssref/css_colornames.asp  www.tizag.com/cssT/border.php */
-				div.main {font-family: monospace; white-space: pre;}
-                .D1, .D2, .D3, .D4, .D5  {background-color:rgba(255,240,240, .2); border-style:ridge; margin:5px; padding:15px;-moz-border-radius:5px; border-radius:5px} /*div {; opacity: 0.3; background-color:GhostWhite; border-left-style:ridge;}  */
-				div.TOC {background-color:rgb(248,248,255); }	
-				div.D5 {font-size:8px;} 
-				//.sq {font-size:12px; font-family: Arial; color:DodgerBlue } 
-				center, .capt {font-size:12px; font-weight:bold; font-family: Arial; margin:auto; text-align:center;}
-				.captTOC {font-size:12px; font-weight:bold; font-family: Arial; align:left}
-				H1,  H2,  H3,  H4,  H5 {color:blue; font-family: Arial; color:teal;}
-				.H1, .H2, .H3, .H4, .H5 {color:teal; font-family: Arial; font-weight:bold;  display:inline-block; display:-moz-inline-box;}
-				H1, .H1 {font-size:36px;  margin-top:36px;  margin-bottom:8px;  margin-left:0px; } 
-				H2, .H2 {font-size:28px;  margin-top:28px;  margin-bottom:5px;  margin-left:20px;} 
-				H3, .H3 {font-size:24px;  margin-top:15px;  margin-bottom:3px;  margin-left:40px;}
-				H4, .H4 {font-size:18px;  margin-top:12px;  margin-bottom:2px;  margin-left:60px;}
-				H5, .H5 {font-size:14px;  margin-top:10px;  margin-bottom:1px;  margin-left:80px;}
-				img.pic, .captTOC, img.tnTOC {margin-top:0px;   margin-bottom:0px;  margin-left:10px;} //80px;}
-				span.captTOC, img.tnTOC { display: block;}
-				.D77 { display:inline; }
-				img, .aD, iframe {border-style:none; border:0}
-				/* .dimg{height:90px;  display:inline-block;} /* position:fixed;  position:absolute;*/ 
-                .imgGal{margin-top:1px;   margin-bottom:1px;  margin-left:1px; height:100px} /*height:100%; max-width:100%; max-height:100%; }/* position:absolute; fixed;*/ 
-				
-				.fun {color:indigo; font-weight:bold;}
-				.comment {color:green; align:left}
-				.comment2 {color: rgb(100,200,100); font-size:3px; -webkit-text-size-adjust: none;}
-				.text, .sq {color: teal; font-size:12px;}
-				</style>
-				</head><body>') 
-		
-		footer=	'<div id= "show" style= "position: absolute; left:-1000px; top:1px; border:solid blue; padding:5; display:none; background-color:white; -moz-border-radius: 10px; border-radius: 10px;">
-				<img id="showPic" src="" height="400px" style="left:0px"/><br/>
-				<span id="showTxt"></span>
-				</div></body></html>'
-
-		out= c(header, '		# <a href="#" id= "aToggleAll">Fold</a> All |
+		out= c(header.jQuery, '		# <a href="#" id= "aToggleAll">Fold</a> All |
 				<a href="#" class= "aToggleAllPic">Toggle</a> all pics | 
 				<a href="#" class= "aToggle TOC">Fold</a> contents |
 				<a href="#" class= "aToggle DD2">Fold</a> H2 |
@@ -422,9 +446,9 @@ cc= code2HTML= code2HTMLjQuery= function(.theFile= theFile, img='img', FullSynta
 			catf('expl("file://%s")', .theFile %+% outSuffix)
 			if(show) expl("file://" %+% .theFile %+% outSuffix)
 		}
-	invisible(list(theFile=.theFile, header=header, pics=pics, toc=toc, main=main, footer=footer, out=out))
+	invisible(list(theFile=.theFile, header=header.jQuery, pics=pics, toc=toc, main=main, footer=footer, out=out))
 }
-#cc= function()code2HTML(theFile) #  cc()
+#  cc()
 
 
 
@@ -513,9 +537,9 @@ createRWJalbum= function(RWJournals, fout= '../all.Pic.htm', outSuffix= attr(.re
 # createRWJalbum(RWJournals, fout='../all.Pic.35.htm')
 # createRWJalbum(RWJournals.42b, fout='../RAlbum.42b.htm', outSuffix='.htm')
 
-
-#e gff('IPH2ClickCountThreshold *=', 'OUTPUT|@EnableDebugg', f="M:/73_ShivaAegisAdjust/AegisCustomDataSourceView.templ-J.script")
-gff= function(patt=' ===', pattNeg='gff', f= theFile, withLineNumb= T){ # grep pattern in the file
+#' grep pattern in the file
+#e gff('= func', '^\\s*#', f=system.file('rcode/WorkJournal.r', package ='WorkJournal'))
+gff= function(patt=' ===', pattNeg='gff', f= get.theFile(), withLineNumb= T){ 
 	catt(3099,'============================ gff:', f)
 	s= readLines(f, warn=F)
 	ii= grepl(patt, s) & !grepl(pattNeg, s)
@@ -565,7 +589,7 @@ fsub= function(fin="M:/83_ScopeR/AegisCustomDataSourceView.script"
 	#	catt(names(args))
 	#	str(args)
 	
-	for(key in names(args)) s= gsub(key, eval(args[[key]], envir= sys.parent()), s)
+	for(key in names(args)){catt(key,'->', eval(args[[key]], envir= sys.parent())); s= gsub(key, eval(args[[key]], envir= sys.parent()), s)} 
 	
 	catt('fsub: Creating OutputFile:', fout)
 	#catf('::: s= gsub(\'\', \'\',  s)\n::: writeLines(he(s,9999), con =\'%s\')', fout)
@@ -610,9 +634,11 @@ if (0) {
 }
 
 
+#'   Create New Project from template
+#en  CreateNewProj(newProj.name= '96_aaaa', root='../../')
 CreateProj= CreateProject= CreateNewProj= function(newProj.name= 'newProjTemplName'
-		, Templ.dir= 'T:/work/UseR-2013/99_commonR/newProjTemplName'
-		, root='T:/work/UseR-2013'
+		, Templ.dir= system.file('newProjTemplName', package ='WorkJournal')  # 'T:/work/UseR-2013/99_commonR/newProjTemplName'
+		, root= gw()  # 'c:/'
 		, R2wd= F, overOut=F) {
 	sw(sf('%s/%s', root, newProj.name))
 	dir.create('in')
@@ -848,12 +874,15 @@ getQuoteCommentStatus= function(s, verb=F) {
 
 
 
-#' get status for single, double quotes, backticks - single symbol on the line
-#e s2= getQuoteCommentStatus(s= c('1abs#bb\n2#a"cc"\n3aa"bb#cc\n4`aa"b`b', '5aa"bb#cc\n6a\'aa#"bb')); prr(s2)
+# get status for single, double quotes, backticks - single symbol on the line
+# s2= getQuoteCommentStatus(s= c('1abs#bb\n2#a"cc"\n3aa"bb#cc\n4`aa"b`b', '5aa"bb#cc\n6a\'aa#"bb')); prr(s2)
 if (0) {
 	s= readLines(textConnection(' x=1
 							
-							"bb
+							"bb **cc** *dd*
+
+## bhbhbh
+
 							"
 							y=0
 							z=3
@@ -864,7 +893,8 @@ if (0) {
 							
 							'))
 }
-ccc= parse.single.line.quotes= function(file=theFile, s=readLines(file), verb=F, exec=T) {
+
+ccc= parse.single.line.quotes= function(file= get.theFile(), s=readLines(file), verb=F, exec=T) {
 		#sing.quo= gregexpr('^\\s*([\'"`])\\s*$', s)
 		sing.quo= regexpr('^\\s*([\'"`])\\s*$', s)
 		if (0) {
@@ -925,22 +955,39 @@ ccc= parse.single.line.quotes= function(file=theFile, s=readLines(file), verb=F,
 		attr(s5, 'detailes')= u
 		invisible(s5)
 }
-# u= parse.single.line.quotes(file=theFile, verb=F, exec=T)
-gw()
+# u= parse.single.line.quotes(file= get.theFile(), verb=F, exec=T)
+# gw()
 
 
-ccc2= parse.terminal.line.quotes2= function(file=theFile, s=readLines(file), verb=F, exec=T) {
+ccc2= parse.terminal.line.quotes2= function(file= get.theFile(), s=readLines(file), verb=F, exec=T) {
+	s=readLines('m:/50_HLP/out/HLP_demo/HLP_demo.r')
+	
 	#sing.quo= gregexpr('^\\s*([\'"`])\\s*$', s)
-	s= gsub('\t','    ', s)
+	s= gsub('\t','    ', s)  # prr(s)
 	sing.quo= regexpr('^\\s*([\'"`])\\s*$', s)
-	start.q= gre2('^\\s*[\'"`]', '^([\'"`]).*\\1', s, v=F)
-	end.q= gre2('[\'"`]\\s*$', '([\'"`]).*\\1$', s, v=F)
-	ich= cumsum(end.q | start.q)
+	q1= gre2('^\\s*[\'"`]', '^\\s*([\'"`]).*\\1\\S', s, v=F)  # line start quote
+	q2= gre2('[\'"`]\\s*$', '\\S([\'"`]).*\\1\\s*$', s, v=F)  # line end quote
+	ich= cumsum(q2 | q1)
+	iich= ich - ifelse(ich%%2, 0, c(0, diff(ich)))
+	text= ifelse(q1, sub('^\\s*[\'"`]', '', s), s)
+	text= ifelse(q2, sub('[\'"`]\\s*$','', text), text)  # prr(text)
+	
+	
+	u= df(s, iich= ich - ifelse(ich%%2, 0, c(0, diff(ich))), ich, is.code=1- iich%%2, text,q1,q2, stringsAsFactors = F)
+	chunks= dlply(u, .(iich, is.code), I)
+	
+	require(markdown)
+#	sh= unlist(sapply(chunks, function(cha){if(cha$is.code[1])c("\n<pre><code>", cha$text, "</code></pre>\n" ) 
+#						else markdownToHTML(text=cha$text, fragment.only=T)}))
+	
+	sh= unlist(sapply(chunks, function(cha){if(cha$is.code[1])c("\n<pre><code>", cha$text, "</code></pre>\n" ) 
+						else cha$text}))  # prr(sh)
+		
 	#df(start.q, end.q, ich=cumsum(start.q + end.q), s)
 	#s2= ifelse(start.q, "</code>",'') %+% s %+% ifelse(end.q, "<code>",'')
 	#s2= ifelse(start.q, "```\n",'') %+% ifelse(ich%%2, '', '    ') %+%  s %+% ifelse(end.q & !start.q, "\n```",'')
 	#s2= ifelse(start.q, "`\n",'') %+% ifelse(ich%%2, '', '\t') %+%  s %+% ifelse(end.q & !start.q, "\n`",'')
-	s2= ifelse(start.q, "</code></pre>\n",'') %+% ifelse(ich%%2, '', '\t') %+%  s %+% ifelse(end.q & !start.q, "\n<pre><code>",'')
+	s2= ifelse(q1, "</code></pre>\n",'') %+% ifelse(ich%%2, '', '\t') %+%  s %+% ifelse(q2 & !q1, "\n<pre><code>",'')
 	#s2= ifelse(ich%%2, '', '\t') %+%  s 
 	#s3= c("`\n", s2, "`\n\n") %+% '\n'
 	s3= c("<pre><code>\n", s2, "</code></pre>\n\n") %+% '\n'
@@ -950,9 +997,16 @@ ccc2= parse.terminal.line.quotes2= function(file=theFile, s=readLines(file), ver
 	
 	
 	
+	s3=sh %+% '\n'
+	sw('m:/62_MM_dispos/out')
 	cat(s3, file='m:/62_MM_dispos/out/zz.md')
 	markdownToHTML('m:/62_MM_dispos/out/zz.md', 'zz.htm', fragment.only=F)
+	cc('m:/62_MM_dispos/out/zz.htm.htm')
 	expl('zz.htm')
+	
+	file.remove('zz.htm')
+	
+	zzz
 	
 	#execf('d:/z/arc/MultiMarkdown-Windows-Portable-4.3.1/multimarkdown.exe "m:/62_MM_dispos/out/zz.md" >> m:/62_MM_dispos/out/zz.htm')
 	#expl('zz.htm')
@@ -996,19 +1050,21 @@ sg= HHp= function(capt=.main, Width = dev.size(units = "px")[1] , off= T,  Heigh
 #' add title to the last graph, then save it.
 sgg= function(capt='', ...) {title(capt); sg(capt, ...)}
 
-nope= function(){ #==  try rCharts  ==
-	libra(devtools)
-	install_github('rCharts', 'ramnathv')
+nope.rCharts= function()
+{ #==  try rCharts  ==
+	if(!require(rCharts)){  # libra(rCharts)  # - not on CRAN yet
+		libra(devtools)
+		install_github('rCharts', 'ramnathv')
+		
+#		install.packages('C:/Users/azolotovitski/Downloads/ramnathv-rCharts-b1061ab.tar.gz', repos = NULL, type='source')
+#		install.packages('C:/Users/azolotovitski/Downloads/rCharts-master.zip', repos = NULL, type='source')
+#		install.packages('C:/Users/azolotovitski/Downloads/rCharts-master.zip', repos = NULL, type='win.binary')
+		#  C:\>z\eclipse\R-2.14.2\bin\x64\R.exe  --vanilla CMD INSTALL C:\Users\azolotovitski\Downloads\rCharts-master\rCharts-master
+	}
 	
-	install.packages('C:/Users/azolotovitski/Downloads/ramnathv-rCharts-b1061ab.tar.gz', repos = NULL, type='source')
-	install.packages('C:/Users/azolotovitski/Downloads/rCharts-master.zip', repos = NULL, type='source')
-	install.packages('C:/Users/azolotovitski/Downloads/rCharts-master.zip', repos = NULL, type='win.binary')
-	
-	#  C:\>z\eclipse\R-2.14.2\bin\x64\R.exe  --vanilla CMD INSTALL C:\Users\azolotovitski\Downloads\rCharts-master\rCharts-master
 	
 	
-	require(rCharts)
-	#libra(rCharts)  # not on CRAN yet
+	
 	
 	names(iris) = gsub("\\.", "", names(iris))
 	p1 <- rPlot(SepalLength ~ SepalWidth | Species, data = iris, color = "Species", size="PetalWidth", type = "point", dom='zzz')  # http://www.polychartjs.com/demo?bubble_chart
@@ -1098,6 +1154,26 @@ nope= function(){ #==  try rCharts  ==
 }
 
 
+if (0) {
+	
+	#' to source the gist use URL from "<>" (View raw):
+	#e source.gist('http://goo.gl/TkRSD2')  # test1.R
+	#e source.gist('http://bit.ly/source-gist_R')
+	#e source.gist('https://gist.githubusercontent.com/alexzolot/9db6c623622bc0491ee3/raw/858fad86853ab20fd061a024e81d60ea82cdbe66/test1.R')
+	
+	source.gist= function(url='http://goo.gl/TkRSD2') {
+		require("RCurl")
+		ur= getURLContent(url, header = TRUE, ssl.verifypeer = FALSE)
+		
+		code=  if(is.na(loc<- ur$header['Location']) ){ur$body  # url is full
+			   }  else getURL(loc, ssl.verifypeer = FALSE)      # url is "short url"
+		eval(parse(text= code), envir= .GlobalEnv)
+	}
+
+	
+}
+
+
 if(0) {#===  Work with Eclipse installation  ===
 	d.st='M:\\71_UseR-2013-Cont\\eclipse-Stand'
 	d.te='M:\\71_UseR-2013-Cont\\eclipse-tester'
@@ -1159,22 +1235,35 @@ replaceTagsOutSq= function(s= readLines('M:/85_Otto/85_Otto.r', warn=F)){
 }
 
 
-
-
-
-#' transform comments #w  to roxygen 
-#p file - input R file
-c2r= Comments2Roxygen= function(file=theFile, suffOut='-copy', fsub=T, exec=T,...) {
-	if(fsub){
-		fsub(fin= file
-				, fout= fout<- gsub('\\.r$', suffOut %+% '.r', file)
-				, fileShow= T
-				, `^#w `= "#' wrapper for ", `^#p `= "#' @param "
-				, `^#e `= "#' @examples ", `^#ed `= "#' @examples \\dontrun")
-		catt('fout=', fout, '\ndirn= ', dirname(dirname(fout)))
-	} 
-	if(exec)roxygenize(dirname(fout), ...)
+#' transform Comments to Roxygen
+#en c2r(file= get.theFile(), suffOut='-copy', exec=F) 
+c2r= Comments2Roxygen= function(file= get.theFile(), suffOut='-copy'
+		, fout= fout<- gsub('\\.r$', suffOut %+% '.r', file)
+		, exec=T, ...) {
+	s= fsub(fin=file
+			, fout
+			, fileShow= F
+			, `^#w `= "#' wrapper for "
+			, `^#p `= "#' @param "
+			, `^#' ex:`= "#e "
+			, `^#en (.*)`= "#e \\\\dontrun{\n#'  \\1\n#' }" 
+			, `^#e (.*)`= "#' @examples \n#'  \\1"
+			, '^((([^#]+)= ?)+ ?functi.*)$'= "#\' @title \\3\n#' @aliases \\3 \n\\1"
+			, '\\bF\\b'='FALSE'
+			, '\\bT\\b'='TRUE'
+			, ',([^\\s"\'])'=', \\1'  # insert blanks after comma, excluding quotes and spaces
+			, zBase0= 'HaLaP', zCode= 'RWorkJournal')
+	
+	s= readLines(fout, warn = F)
+	s[grepl('^#. @aliases ', s)]= gsub(' *= *', ' ', s[grepl('^#. @aliases ', s)])
+	writeLines(head(s,99999), con = fout)
+	
+	if(exec) roxygenize(fout,...)
 }
+
+#	gsub(',([^\\s"\'])', ', \\1', ',xs')
+#	gsub(',([^\\s"\'])', ', \\1', ',"')
+#	gsub(',([^\\s"\'])', ', \\1', ",'")
 
 if (0) {
 	## example: https://github.com/hadley/r2d3/blob/master/R/r2d3.r
@@ -1195,6 +1284,10 @@ if(0){   #== Misc
 	
 	gff('saved', theFile)
 	gff('sa\\(|===', theFile)
+
+	theFile='M:/50_HLP/out/packages/WorkJournal/inst/WorkJournal.r'
+	gff('getQuoteCommentStatus', theFile)
+	gff('theFile', theFile)
 	
 	theFile= fp(proot, '80_ChurnSim.r')
 	#ccc= function()code2HTML(theFile)
@@ -1202,5 +1295,6 @@ if(0){   #== Misc
 	cc()
 	
 	shell('start explorer file:\\\\m:\\80_ChurnSim\\80_ChurnSim.r.jQ.htm')
+	CreateNewProj(newProj.name= 'HLP_demo', Templ.dir= 'T:/work/UseR-2013/lib/newProjTemplName', root='m:/50_HLP/out')
 } #--
 

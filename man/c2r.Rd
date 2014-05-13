@@ -3,12 +3,15 @@
 \alias{c2r}
 \title{c2r= Comments2Roxygen}
 \usage{
-c2r(file = theFile, suffOut = "-copy", fsub = TRUE, exec = TRUE, ...)
-}
-\arguments{
-  \item{file}{- input R file}
+c2r(file = get.theFile(), suffOut = "-copy", fout = fout <-
+  gsub("\\\\.r$", suffOut \%+\% ".r", file), exec = TRUE, ...)
 }
 \description{
-transform comments #w to roxygen
+transform Comments to Roxygen
+}
+\examples{
+\dontrun{
+ c2r(file= get.theFile(),  suffOut='-copy',  exec=FALSE)
+}
 }
 

@@ -3,7 +3,7 @@
 \alias{code2HTML.md}
 \title{ccm= code2HTML.md}
 \usage{
-ccm(.theFile = theFile, img = "img", FullSyntaxHighlight = FALSE,
+ccm(.theFile = get.theFile(), img = "img", FullSyntaxHighlight = FALSE,
   classicHeaders = FALSE, show = TRUE, toSave = TRUE,
   outSuffix = ".htm")
 }

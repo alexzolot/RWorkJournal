@@ -5,7 +5,7 @@
 #' @description R Work Journal and Helper Funcs for work with code and file system
 #' for a book "Handling Large R Projects"
 #' 
-#' abbreviations: ds - dataset, patt - pattern, pattNeg - negative pattern,  #e - example,  #en - example \notrun
+#' abbreviations: ds - dataset, patt - pattern, pattNeg - negative pattern,  #e - example,  #en - example "\notrun"
 #' @author Alex Zolotovitski <alex@@zolot.us>
 #' License: GPL-2  
 
@@ -35,6 +35,7 @@ prr= function(x, ma='', header=T) {if(header)catf('\n&&& %s == %s ==\n', ma, dep
 cn= function(cnn,  sep='[ ,\n\t\\+]+') unlist(strsplit(cnn, sep))
 
 #' wrapper for paste
+#e  'a' %+%  1:3
 '%+%' = paste0 #function(x, y) paste(x, y, sep= "")
 
 
@@ -635,9 +636,9 @@ if (0) {
 
 
 #'   Create New Project from template
-#en  CreateNewProj(newProj.name= '96_aaaa', root='../../')
+#en  CreateNewProj(newProj.name= '96_aaaa', root='../../'); sw('../..')
 CreateProj= CreateProject= CreateNewProj= function(newProj.name= 'newProjTemplName'
-		, Templ.dir= system.file('newProjTemplName', package ='WorkJournal')  # 'T:/work/UseR-2013/99_commonR/newProjTemplName'
+		, Templ.dir= system.file('newProjTemplName', package ='WorkJournal')  
 		, root= gw()  # 'c:/'
 		, R2wd= F, overOut=F) {
 	sw(sf('%s/%s', root, newProj.name))
@@ -695,6 +696,7 @@ if(0) { #= Jun 23, 2013
 	# CreateNewProj(newProj.name= 'newProjTemplName', Templ.dir= 'R:/work/R-svn-ass/00_commonR/71_TestProjTemplate/zProjTempl', root='M:')
 	CreateNewProj(newProj.name= '97_tutorial-demo', Templ.dir= 'T:/work/UseR-2013/99_commonR/newProjTemplName', root='T:/work/UseR-2013')
 	CreateNewProj(newProj.name= '96_aaa', Templ.dir= 'T:/work/UseR-2013/99_commonR/newProjTemplName', root='T:/work/UseR-2013')
+	CreateNewProj(newProj.name= '98_aaa'); sw('../..')
 }
 
 
@@ -768,7 +770,7 @@ if(0) { #= Jun 23, 2013
 	}
 
 	
-	listFuncDef= function(theFile=  "R:/work/R-svn-ass/00_commonR/zBase.r", stoplist='^(c|if|for|function|with|within|exp|log|list|legend|lm|ifelse|invisible|ecdf|lines|plot|min|max|na\\.omit|f|expression|options|rgamma|runif|round|str|unique)$'){
+	listFuncDef= function(theFile= get.theFile(), stoplist='^(c|if|for|function|with|within|exp|log|list|legend|lm|ifelse|invisible|ecdf|lines|plot|min|max|na\\.omit|f|expression|options|rgamma|runif|round|str|unique)$'){
 		s1= readLines(theFile, warn=F)  
 		catt('le(s1)=', le(s1))
 		x= ListPatt(s= s1, patt='([A-z0-9_\\.]+ *= *)+function\\(' )  #	print(x)
@@ -777,7 +779,7 @@ if(0) { #= Jun 23, 2013
 	}
 	
 	if(0){
-		x= listFuncDef(theFile=  "R:/work/R-svn-ass/00_commonR/zBase.r")
+		x= listFuncDef(theFile= get.theFile())
 		hee(srt(x, ~-Freq), 99)
 		in.zBase= unlist(strsplit(x$x, c('=', ' ')))
 		pas(in.zBase)
@@ -785,7 +787,7 @@ if(0) { #= Jun 23, 2013
 	}
 
 	
-	listFuncUsage= function(theFile=  "m:/80_ChurnSim/80_ChurnSim.r", stoplist='^(c|if|for|function|with|within|exp|log|list|legend|lm|ifelse|invisible|ecdf|lines|plot|min|max|na\\.omit|f|expression|options|rgamma|runif|round|str|unique)$'){
+	listFuncUsage= function(theFile= get.theFile(), stoplist='^(c|if|for|function|with|within|exp|log|list|legend|lm|ifelse|invisible|ecdf|lines|plot|min|max|na\\.omit|f|expression|options|rgamma|runif|round|str|unique)$'){
 		s1= readLines(theFile, warn=F)
 		x= ListPatt(s= s1, patt='[A-z0-9_\\.]+\\(' )
 		x$x= gsub('\\($', '', x$x)
@@ -958,9 +960,8 @@ ccc= parse.single.line.quotes= function(file= get.theFile(), s=readLines(file), 
 # u= parse.single.line.quotes(file= get.theFile(), verb=F, exec=T)
 # gw()
 
-
 ccc2= parse.terminal.line.quotes2= function(file= get.theFile(), s=readLines(file), verb=F, exec=T) {
-	s=readLines('m:/50_HLP/out/HLP_demo/HLP_demo.r')
+	#s=readLines('m:/50_HLP/out/HLP_demo/HLP_demo.r', warn =0)
 	
 	#sing.quo= gregexpr('^\\s*([\'"`])\\s*$', s)
 	s= gsub('\t','    ', s)  # prr(s)
@@ -968,7 +969,7 @@ ccc2= parse.terminal.line.quotes2= function(file= get.theFile(), s=readLines(fil
 	q1= gre2('^\\s*[\'"`]', '^\\s*([\'"`]).*\\1\\S', s, v=F)  # line start quote
 	q2= gre2('[\'"`]\\s*$', '\\S([\'"`]).*\\1\\s*$', s, v=F)  # line end quote
 	ich= cumsum(q2 | q1)
-	iich= ich - ifelse(ich%%2, 0, c(0, diff(ich)))
+	iich= ich - ifelse(ich%%2, 0, c(0, diff(ich)))  # chunk index, from 0; 0 is.code
 	text= ifelse(q1, sub('^\\s*[\'"`]', '', s), s)
 	text= ifelse(q2, sub('[\'"`]\\s*$','', text), text)  # prr(text)
 	
@@ -980,14 +981,19 @@ ccc2= parse.terminal.line.quotes2= function(file= get.theFile(), s=readLines(fil
 #	sh= unlist(sapply(chunks, function(cha){if(cha$is.code[1])c("\n<pre><code>", cha$text, "</code></pre>\n" ) 
 #						else markdownToHTML(text=cha$text, fragment.only=T)}))
 	
-	sh= unlist(sapply(chunks, function(cha){if(cha$is.code[1])c("\n<pre><code>", cha$text, "</code></pre>\n" ) 
-						else cha$text}))  # prr(sh)
-		
+	sh= unname(unlist(sapply(chunks, function(chu){if(chu$is.code[1])c("\n<pre><code>", chu$text, "</code></pre>\n" ) 
+								else chu$text})))  # prr(sh)
+	s3=sh  %+% '\n'   # prr(s3)	
+	s3= gsub('^ *#', '#', s3)
+	s4= markdownToHTML(text= s3, fragment.only=F, options = "highlight_code")  
+	return(list(lines=u, chunks= chunks, s.md= s3, s.htm= s4))
+#'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''	
+	
 	#df(start.q, end.q, ich=cumsum(start.q + end.q), s)
 	#s2= ifelse(start.q, "</code>",'') %+% s %+% ifelse(end.q, "<code>",'')
 	#s2= ifelse(start.q, "```\n",'') %+% ifelse(ich%%2, '', '    ') %+%  s %+% ifelse(end.q & !start.q, "\n```",'')
 	#s2= ifelse(start.q, "`\n",'') %+% ifelse(ich%%2, '', '\t') %+%  s %+% ifelse(end.q & !start.q, "\n`",'')
-	s2= ifelse(q1, "</code></pre>\n",'') %+% ifelse(ich%%2, '', '\t') %+%  s %+% ifelse(q2 & !q1, "\n<pre><code>",'')
+	s2= ifelse(q1, "</code></pre>\n",'') %+% ifelse(ich%%2, '', '\t') %+%  s %+% ifelse(q2 & !q1, "\n<pre><code>", '') #c('a','b') %+% 1:2
 	#s2= ifelse(ich%%2, '', '\t') %+%  s 
 	#s3= c("`\n", s2, "`\n\n") %+% '\n'
 	s3= c("<pre><code>\n", s2, "</code></pre>\n\n") %+% '\n'
@@ -996,22 +1002,37 @@ ccc2= parse.terminal.line.quotes2= function(file= get.theFile(), s=readLines(fil
 	# gw: sw("");  expl()
 	
 	
+	sh= unname(unlist(sapply(chunks, function(chu){if(chu$is.code[1])c("\n'''r\n", chu$text, "\n'''\n" ) 
+								else chu$text})))  # prr(sh)
+	s3=sh  %+% '\n'   # prr(s3)
+	s2= ifelse(q1, "\n'''\n",'') %+% ifelse(ich%%2, '', '\t') %+%  s %+% ifelse(q2 & !q1, "\n'''r\n", '') #c('a','b') %+% 1:2
+	s3= c("'''r\n", s2, "\n'''\n\n") %+% '\n'
+	s3= gsub('^ *#', '#', s3)
 	
-	s3=sh %+% '\n'
+	
 	sw('m:/62_MM_dispos/out')
-	cat(s3, file='m:/62_MM_dispos/out/zz.md')
-	markdownToHTML('m:/62_MM_dispos/out/zz.md', 'zz.htm', fragment.only=F)
-	cc('m:/62_MM_dispos/out/zz.htm.htm')
-	expl('zz.htm')
+	cat(s3, file='m:/62_MM_dispos/out/zz.md', sep='')
+	markdownHTMLOptions()
+	expl(system.file('resources', 'markdown.html', package = 'markdown') )
+	markdownToHTML('m:/62_MM_dispos/out/zz.md', 'm:/62_MM_dispos/out/zz.htm', fragment.only=F, options = "highlight_code")  # prr('zz.md')
+	cc('m:/62_MM_dispos/out/zz.htm')
+	expl('m:/62_MM_dispos/out/zz.htm')
+	expl('m:/62_MM_dispos/out/')
 	
 	file.remove('zz.htm')
 	
 	zzz
 	
-	#execf('d:/z/arc/MultiMarkdown-Windows-Portable-4.3.1/multimarkdown.exe "m:/62_MM_dispos/out/zz.md" >> m:/62_MM_dispos/out/zz.htm')
-	#expl('zz.htm')
+	execf('d:/z/arc/MultiMarkdown-Windows-Portable-4.3.1/multimarkdown.exe "m:/62_MM_dispos/out/zz.md" >> m:/62_MM_dispos/out/zz.htm')
+	expl('zz.htm')
 	
 }
+if (0) {
+	u= ccc2= parse.terminal.line.quotes2(s=readLines('m:/50_HLP/out/HLP_demo/HLP_demo.r', warn =0), verb=F, exec=T)
+	strr(u)
+	
+}
+
 
 # do we need  HHInit ??
 #' wrapper for dev.print  -  save graphics to .png file

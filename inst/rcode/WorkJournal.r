@@ -327,7 +327,7 @@ ccm= code2HTML.md=  function(.theFile= get.theFile(), img='img', FullSyntaxHighl
 #ccm()
 
 cc= code2HTML= code2HTMLjQuery= function(.theFile= get.theFile(), img='img', FullSyntaxHighlight= FALSE
-								, classicHeaders=FALSE, show=TRUE, toSave=TRUE, outSuffix='.htm') {
+								, classicHeaders=FALSE, show=TRUE, toSave=TRUE, outSuffix='.htm', wchunks=T) {
 	if(FullSyntaxHighlight){   #== Full syntax highlight ==
 		catt('FullSyntaxHighlight')
 		libra(highlight)
@@ -337,12 +337,25 @@ cc= code2HTML= code2HTMLjQuery= function(.theFile= get.theFile(), img='img', Ful
 	}else{s1= readLines(.theFile, warn=F)
 	}  #--
 	
+	
+	if (wchunks) {
+		#debug(parse.terminal.line.quotes2); undebug(parse.terminal.line.quotes2)
+		u= parse.terminal.line.quotes2(s=s1, verb=F, exec=T)
+		strr(u)
+		# return(list(lines=u, chunks= chunks, s.md= s3, s.htm= s4, s.htm0= s5))
+		s2= u$s0.htm
+		
+		#brr()
+		s1= s2
+	}
+	
 	picss= list()
  	s1= gsub('<(\\s)', '&lt;\\1', s1)  # we suppose no blanks after "<" in <tag    in the input R code
 	s1= replaceTagsOutSq(s1)  # we suppose  <tag>  only in `` in the  R code
 	s1= gsub('@@', '\\\\\\\\', s1)  # drop escapes for LaTeX
 	s1= gsub('(^|[^x"])@', '\\1\\\\', s1)  # drop escapes for LaTeX
 	
+	#brr()
 	
 	#==  Set id  ==
 	for(i in 1:le(s1)){
@@ -657,8 +670,6 @@ CreateProj= CreateProject= CreateNewProj= function(newProj.name= 'newProjTemplNa
 			fsub(fin= fp(Templ.dir, f)
 						, fout= sub('newProjTemplName', newProj.name, f)
 						, fileShow= F, overOut=overOut
-						#, zzz= sf('m:/%s/%1$s\\.r', newProj.name)
-						#, zzz= sf('%s', newProj.name)
 						, newProjTemplName= sf('%s', newProj.name)
 						, `00-00-00`= DT())
 	
@@ -960,76 +971,114 @@ ccc= parse.single.line.quotes= function(file= get.theFile(), s=readLines(file), 
 # u= parse.single.line.quotes(file= get.theFile(), verb=F, exec=T)
 # gw()
 
-ccc2= parse.terminal.line.quotes2= function(file= get.theFile(), s=readLines(file), verb=F, exec=T) {
-	#s=readLines('m:/50_HLP/out/HLP_demo/HLP_demo.r', warn =0)
+#' split code to chunks by single first or last quote: ' ' `
+ccc2= parse.terminal.line.quotes2= function(file= get.theFile(), s= readLines(file), verb=F, exec=T) {
+	#s= readLines('m:/50_HLP/out/HLP_demo/HLP_demo.r', warn =0)
+	
+	#brr()
 	
 	#sing.quo= gregexpr('^\\s*([\'"`])\\s*$', s)
 	s= gsub('\t','    ', s)  # prr(s)
 	sing.quo= regexpr('^\\s*([\'"`])\\s*$', s)
-	q1= gre2('^\\s*[\'"`]', '^\\s*([\'"`]).*\\1\\S', s, v=F)  # line start quote
-	q2= gre2('[\'"`]\\s*$', '\\S([\'"`]).*\\1\\s*$', s, v=F)  # line end quote
+	#q1= gre2('^\\s*[\'"`]', '^\\s*([\'"`]).*\\1\\S', s, v=F)  # line start quote
+	#q2= gre2('[\'"`]\\s*$', '\\S([\'"`]).*\\1\\s*$', s, v=F)  # line end quote
+	q1= gre2('^\\s*[\'"`]', '^\\s*([\'"`]).*\\1', s, v=F)  # line start quote
+	#q2= gre2('[\'"`]\\s*$', '([\'"`]).*\\1\\s*$', s, v=F)  # line end quote
+	q2= gre2('[\'"`]\\s*$', '\\1.*([\'"`])\\s*$', s, v=F)  # line end quote
+	if (0) {
+		s='#  == Code in top and bottom of the R file.  - "cache", "parking lot"'
+		gre2('[\'"`]\\s*$', '([\'"`]).*\\1\\s*$', u$lines$s[180], v=F)
+		gre2('[\'"`]\\s*$', '\\1.*([\'"`])\\s*$', u$lines$s[180], v=F)
+		grepl('[\'"`]\\s*$', u$lines$s[180])
+		grepl('([\'"`]).*\\1\\s*$', u$lines$s[180])
+		regexpr('([\'"`]).*\\1\\s*$', u$lines$s[180])
+		regexpr('([\'"`])', u$lines$s[180])
+		regexpr('([\'"`])\\s*$', u$lines$s[180])
+		s[q1]
+		prr(s[q2])
+		
+	}
 	ich= cumsum(q2 | q1)
 	iich= ich - ifelse(ich%%2, 0, c(0, diff(ich)))  # chunk index, from 0; 0 is.code
 	text= ifelse(q1, sub('^\\s*[\'"`]', '', s), s)
-	text= ifelse(q2, sub('[\'"`]\\s*$','', text), text)  # prr(text)
+	text= ifelse(q2, sub('[\'"`]\\s*$', '', text), text)  # prr(text)
 	
 	
-	u= df(s, iich= ich - ifelse(ich%%2, 0, c(0, diff(ich))), ich, is.code=1- iich%%2, text,q1,q2, stringsAsFactors = F)
-	chunks= dlply(u, .(iich, is.code), I)
+	u= df(line=1:le(s), s, iich= ich - ifelse(ich%%2, 0, c(0, diff(ich))), ich, is.code=1- iich%%2, text,q1,q2, stringsAsFactors = F)
+	chunks= dlply(u, .(iich, is.code), I)  ; strr(chunks)
 	
 	require(markdown)
 #	sh= unlist(sapply(chunks, function(cha){if(cha$is.code[1])c("\n<pre><code>", cha$text, "</code></pre>\n" ) 
 #						else markdownToHTML(text=cha$text, fragment.only=T)}))
 	
-	sh= unname(unlist(sapply(chunks, function(chu){if(chu$is.code[1])c("\n<pre><code>", chu$text, "</code></pre>\n" ) 
-								else chu$text})))  # prr(sh)
-	s3=sh  %+% '\n'   # prr(s3)	
-	s3= gsub('^ *#', '#', s3)
-	s4= markdownToHTML(text= s3, fragment.only=F, options = "highlight_code")  
-	return(list(lines=u, chunks= chunks, s.md= s3, s.htm= s4))
+	sh= unname(unlist(sapply(chunks, function(chu){if(chu$is.code[1])c(sf('\n<pre><code chu="%s" line="%s">', chu$iich[1], chu$line[1])
+								, chu$text, sf('</code chu="%s" line="%s"></pre>\n', chu$iich[1], last(chu$line)) ) 
+								else chu$text}))) ; strr(sh) # prr(sh)
+	s3a=sh # %+%  '\n'   ; strr(s3a)# prr(s3)	
+	s3= gsub('^ *#', '#', s3a)
+	#s4= markdownToHTML(text= s3, fragment.only=F, options = "highlight_code")  
+	
+	strr(s3)
+	
+	s4= markdownToHTML(text= s3, fragment.only=F, options = cn("mathjax highlight_code"))  # toc 
+	strr(s4)
+	s5= markdownToHTML(text= s3, fragment.only=T, options = cn("mathjax highlight_code"))  
+	
+	strr(s5)
+	tf= fp(tempdir(), 's.htm'); cat(s4, file=tf); expl(tf)
+	tf0= fp(tempdir(), 's0.htm'); cat(s5, file=tf0); expl(tf0)
+	return(list(lines=u, chunks= chunks, s.md= s3, s.htm= s4, s0.htm= s5, tf=tf, tf0=tf0))
 #'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''	
 	
-	#df(start.q, end.q, ich=cumsum(start.q + end.q), s)
-	#s2= ifelse(start.q, "</code>",'') %+% s %+% ifelse(end.q, "<code>",'')
-	#s2= ifelse(start.q, "```\n",'') %+% ifelse(ich%%2, '', '    ') %+%  s %+% ifelse(end.q & !start.q, "\n```",'')
-	#s2= ifelse(start.q, "`\n",'') %+% ifelse(ich%%2, '', '\t') %+%  s %+% ifelse(end.q & !start.q, "\n`",'')
-	s2= ifelse(q1, "</code></pre>\n",'') %+% ifelse(ich%%2, '', '\t') %+%  s %+% ifelse(q2 & !q1, "\n<pre><code>", '') #c('a','b') %+% 1:2
-	#s2= ifelse(ich%%2, '', '\t') %+%  s 
-	#s3= c("`\n", s2, "`\n\n") %+% '\n'
-	s3= c("<pre><code>\n", s2, "</code></pre>\n\n") %+% '\n'
-	#s3= s2 #c("```\n", s2, "\n```\n") %+% '\n'
-	gw()
-	# gw: sw("");  expl()
-	
-	
-	sh= unname(unlist(sapply(chunks, function(chu){if(chu$is.code[1])c("\n'''r\n", chu$text, "\n'''\n" ) 
-								else chu$text})))  # prr(sh)
-	s3=sh  %+% '\n'   # prr(s3)
-	s2= ifelse(q1, "\n'''\n",'') %+% ifelse(ich%%2, '', '\t') %+%  s %+% ifelse(q2 & !q1, "\n'''r\n", '') #c('a','b') %+% 1:2
-	s3= c("'''r\n", s2, "\n'''\n\n") %+% '\n'
-	s3= gsub('^ *#', '#', s3)
-	
-	
-	sw('m:/62_MM_dispos/out')
-	cat(s3, file='m:/62_MM_dispos/out/zz.md', sep='')
-	markdownHTMLOptions()
-	expl(system.file('resources', 'markdown.html', package = 'markdown') )
-	markdownToHTML('m:/62_MM_dispos/out/zz.md', 'm:/62_MM_dispos/out/zz.htm', fragment.only=F, options = "highlight_code")  # prr('zz.md')
-	cc('m:/62_MM_dispos/out/zz.htm')
-	expl('m:/62_MM_dispos/out/zz.htm')
-	expl('m:/62_MM_dispos/out/')
-	
-	file.remove('zz.htm')
-	
-	zzz
-	
-	execf('d:/z/arc/MultiMarkdown-Windows-Portable-4.3.1/multimarkdown.exe "m:/62_MM_dispos/out/zz.md" >> m:/62_MM_dispos/out/zz.htm')
-	expl('zz.htm')
+	if (0) {
+		#df(start.q, end.q, ich=cumsum(start.q + end.q), s)
+		#s2= ifelse(start.q, "</code>",'') %+% s %+% ifelse(end.q, "<code>",'')
+		#s2= ifelse(start.q, "```\n",'') %+% ifelse(ich%%2, '', '    ') %+%  s %+% ifelse(end.q & !start.q, "\n```",'')
+		#s2= ifelse(start.q, "`\n",'') %+% ifelse(ich%%2, '', '\t') %+%  s %+% ifelse(end.q & !start.q, "\n`",'')
+		s2= ifelse(q1, "</code></pre>\n",'') %+% ifelse(ich%%2, '', '\t') %+%  s %+% ifelse(q2 & !q1, "\n<pre><code>", '') #c('a','b') %+% 1:2
+		#s2= ifelse(ich%%2, '', '\t') %+%  s 
+		#s3= c("`\n", s2, "`\n\n") %+% '\n'
+		s3= c("<pre><code>\n", s2, "</code></pre>\n\n") %+% '\n'
+		#s3= s2 #c("```\n", s2, "\n```\n") %+% '\n'
+		gw()
+		# gw: sw("");  expl()
+		
+		
+		sh= unname(unlist(sapply(chunks, function(chu){if(chu$is.code[1])c("\n'''r\n", chu$text, "\n'''\n" ) 
+									else chu$text})))  # prr(sh)
+		s3=sh  %+% '\n'   # prr(s3)
+		s2= ifelse(q1, "\n'''\n",'') %+% ifelse(ich%%2, '', '\t') %+%  s %+% ifelse(q2 & !q1, "\n'''r\n", '') #c('a','b') %+% 1:2
+		s3= c("'''r\n", s2, "\n'''\n\n") %+% '\n'
+		s3= gsub('^ *#', '#', s3)
+		
+		
+		sw('m:/62_MM_dispos/out')
+		cat(s3, file='m:/62_MM_dispos/out/zz.md', sep='')
+		prr(markdownHTMLOptions())
+		expl(system.file('resources', 'markdown.html', package = 'markdown') )
+		markdownToHTML('m:/62_MM_dispos/out/zz.md', 'm:/62_MM_dispos/out/zz.htm', fragment.only=F, options = "highlight_code")  # prr('zz.md')
+		cc('m:/62_MM_dispos/out/zz.htm')
+		expl('m:/62_MM_dispos/out/zz.htm')
+		expl('m:/62_MM_dispos/out/')
+		
+		file.remove('zz.htm')
+		
+		zzz
+		
+		execf('d:/z/arc/MultiMarkdown-Windows-Portable-4.3.1/multimarkdown.exe "m:/62_MM_dispos/out/zz.md" >> m:/62_MM_dispos/out/zz.htm')
+		expl('zz.htm')
+		
+	}
 	
 }
 if (0) {
-	u= ccc2= parse.terminal.line.quotes2(s=readLines('m:/50_HLP/out/HLP_demo/HLP_demo.r', warn =0), verb=F, exec=T)
+	u= parse.terminal.line.quotes2(s=readLines('m:/50_HLP/out/HLP_demo/HLP_demo.r', warn =0), verb=F, exec=T)
 	strr(u)
+	u$lines[1:5, ]
+	u$lines[81:90, ]
+	u$lines[111:115, ]
+	u$lines[175:180, ]
+	u$lines[192:195, ]
 	
 }
 

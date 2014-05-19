@@ -88,7 +88,7 @@ getQuoteCommentStatusA= function(s, verb=F) {
 					</head><body>') 
 	
 	footer=	'<div id= "show" style= "position: absolute; left:-1000px; top:1px; border:solid blue; padding:5; display:none; background-color:white; -moz-border-radius: 10px; border-radius: 10px;">
-			<img id="showPic" src="" height="400px" style="left:0px"/><br/>
+			<img id="showFig" src="" height="400px" style="left:0px"/><br/>
 			<span id="showTxt"></span>
 			</div></body></html>'
 	
@@ -119,7 +119,7 @@ getQuoteCommentStatusA= function(s, verb=F) {
 					$(function(){
 					//$(".imgGal").draggable() ; //.parent().resizable();
 					$(".dimg").resizable().draggable(); 
-					// $(".pic").draggable();  //.resizable();;
+					// $(".fig").draggable();  //.resizable();;
 					});
 					</script -->
 					
@@ -148,7 +148,7 @@ getQuoteCommentStatusA= function(s, verb=F) {
 					$("div").show(); th.html(imgFold); $("a:not(.comments)").html(imgFold)   
 					} else { $("div").hide(); th.html("(+)"); $("a:not(.comments)").html("(+)")}
 					})
-					//   $(".aToggleAllPic").click(function() {$("img").toggle() })
+					//   $(".aToggleAllFig").click(function() {$("img").toggle() })
 					
 					function toggleD(a, a2, di){ if( a.text() == "(+)") {
 					di.show(); a.html(imgFold); a2.html(imgFold)  
@@ -168,7 +168,7 @@ getQuoteCommentStatusA= function(s, verb=F) {
 					$(".aToggle.DD3").click(function() {toggleD($(this), $(".H3 + + .aD"), $(".D3")) })
 					$(".aToggle.DD4").click(function() {toggleD($(this), $(".H4 + + .aD"), $(".D4")) })
 					$(".aToggle.TOC").click(function() {toggleD($(this), $(".zz"), $("div.TOC")) })
-					$(".aToggleAllPic").click(function() {toggleD($(this), $(".zz"), $("img")) })
+					$(".aToggleAllFig").click(function() {toggleD($(this), $(".zz"), $("img")) })
 					$(".aToggleComments").click(function() {
 					ToggleComments2(); return;
 					
@@ -221,7 +221,7 @@ getQuoteCommentStatusA= function(s, verb=F) {
 					y= e.offsetTop+ e.height + 10               //y= e.y+ e.height + 10
 					
 					$("#show").css({left: x, top: y})
-					$("#showPic").attr("src", e.src)
+					$("#showFig").attr("src", e.src)
 					$("#showTxt").html("<br/>" +  e.name)  //  +  e.alt)
 					
 					/* show properties of e 
@@ -250,7 +250,7 @@ getQuoteCommentStatusA= function(s, verb=F) {
 					H3, .H3 {font-size:24px;  margin-top:15px;  margin-bottom:3px;  margin-left:40px;}
 					H4, .H4 {font-size:18px;  margin-top:12px;  margin-bottom:2px;  margin-left:60px;}
 					H5, .H5 {font-size:14px;  margin-top:10px;  margin-bottom:1px;  margin-left:80px;}
-					img.pic, .captTOC, img.tnTOC {margin-top:0px;   margin-bottom:0px;  margin-left:10px;} //80px;}
+					img.fig, .captTOC, img.tnTOC {margin-top:0px;   margin-bottom:0px;  margin-left:10px;} //80px;}
 					span.captTOC, img.tnTOC { display: block;}
 					.D77 { display:inline; }
 					img, .aD, iframe {border-style:none; border:0}
@@ -265,7 +265,7 @@ getQuoteCommentStatusA= function(s, verb=F) {
 					</head><body>') 
 			
 			footer=	'<div id= "show" style= "position: absolute; left:-1000px; top:1px; border:solid blue; padding:5; display:none; background-color:white; -moz-border-radius: 10px; border-radius: 10px;">
-					<img id="showPic" src="" height="400px" style="left:0px"/><br/>
+					<img id="showFig" src="" height="400px" style="left:0px"/><br/>
 					<span id="showTxt"></span>
 					</div></body></html>'
 			
@@ -327,7 +327,7 @@ ccm= code2HTML.md=  function(.theFile= get.theFile(), img='img', FullSyntaxHighl
 #ccm()
 
 cc= code2HTML= code2HTMLjQuery= function(.theFile= get.theFile(), img='img', FullSyntaxHighlight= FALSE
-								, classicHeaders=FALSE, show=TRUE, toSave=TRUE, outSuffix='.htm', wchunks=T) {
+								, classicHeaders=TRUE, show=TRUE, toSave=TRUE, outSuffix='.htm', wchunks=F) {
 	if(FullSyntaxHighlight){   #== Full syntax highlight ==
 		catt('FullSyntaxHighlight')
 		libra(highlight)
@@ -349,7 +349,7 @@ cc= code2HTML= code2HTMLjQuery= function(.theFile= get.theFile(), img='img', Ful
 		s1= s2
 	}
 	
-	picss= list()
+	figss= list()
  	s1= gsub('<(\\s)', '&lt;\\1', s1)  # we suppose no blanks after "<" in <tag    in the input R code
 	s1= replaceTagsOutSq(s1)  # we suppose  <tag>  only in `` in the  R code
 	s1= gsub('@@', '\\\\\\\\', s1)  # drop escapes for LaTeX
@@ -359,25 +359,28 @@ cc= code2HTML= code2HTMLjQuery= function(.theFile= get.theFile(), img='img', Ful
 	
 	#==  Set id  ==
 	for(i in 1:le(s1)){
-		if(grepl('^\\s*#\\s* Pic_\\d+', s1[i])) picss[[ch(i)]]= s1[i]
+		if(grepl('^\\s*#\\s* (Pic|Fig)_\\d+', s1[i])) figss[[ch(i)]]= s1[i]
 		
-		s1[i]= gsub('^([^\\~]*# *"?)(jPic_\\d+)(.*)','\n\n <iframe src="img/\\2.htm" width="100%" height="600px"></iframe>\n\n \\1\\2\\3' , s1[i])
+		s1[i]= gsub('^([^\\~]*# *"?)(jFig_\\d+)(.*)','\n\n <iframe src="img/\\2.htm" width="100%" height="600px"></iframe>\n\n \\1\\2\\3' , s1[i])
 		
 
 		s1[i]= gsub('^([^\\~]*# *"?)(Pic_\\d+)(.*)', sf('
-								<br/><img id="%s" class="pic" src="%s/\\2.png" width=700 onClick="resize(%1$s);" ondblclick="ShowImg(\'\\2\', \'\\3\');" name="\\2\\3"/>   
+								<br/><img id="%s" class="fig" src="%s/\\2.png" width=700 onClick="resize(%1$s);" ondblclick="ShowImg(\'\\2\', \'\\3\');" name="\\2\\3"/>   
 								<br/><span class="capt" onClick="goto(\'tnTOC%1$s\');" ondblclick="ShowImg(\'\\2\', \'\\3\')">\\1\\2\\3</span><br/>',  i, img), s1[i])
-		s1[i]= gsub('(.*\\s*#==== )(.*)( =+.*)$', sf('</pre>\\1<span class="H1" id="%s" onClick="goto(\'tn%s\');">\\2</span> <span class="comment2">\\3</span><pre>',i,i),  s1[i])
-		s1[i]= gsub('(.*\\s*#=== )(.*)( =+.*)$',  sf('</pre>\\1<span class="H2" id="%s" onClick="goto(\'tn%s\');">\\2</span> <span class="comment2">\\3</span><pre>',i,i),  s1[i])
-		s1[i]= gsub('(.*\\s*#== )(.*)( =+.*)$' ,  sf('</pre>\\1<span class="H3" id="%s" onClick="goto(\'tn%s\');">\\2</span> <span class="comment2">\\3</span><pre>',i,i),  s1[i])
-		s1[i]= gsub('(.*\\s*#= )(.*)( =+.*)$'  ,  sf('</pre>\\1<span class="H4" id="%s" onClick="goto(\'tn%s\');">\\2</span> <span class="comment2">\\3</span><pre>',i,i),  s1[i])
-		s1[i]= gsub('(.*\\s*#=+)([^=]*)$'      ,  sf('</pre>\\1<span class="H5" id="%s" onClick="goto(\'tn%s\');">\\2</span> <span class="comment2">\\3</span><pre>',i,i),  s1[i])
+		s1[i]= gsub('^([^\\~]*# *"?)(Fig_\\d+)(.*)', sf('
+								<br/><img id="%s" class="fig" src="%s/\\2.png" width=700 onClick="resize(%1$s);" ondblclick="ShowImg(\'\\2\', \'\\3\');" name="\\2\\3"/>   
+								<br/><span class="capt" onClick="goto(\'tnTOC%1$s\');" ondblclick="ShowImg(\'\\2\', \'\\3\')">\\1\\2\\3</span><br/>',  i, img), s1[i])
+		#		s1[i]= gsub('(.*\\s*#==== )(.*)( =+.*)$', sf('</pre>\\1<span class="H5" id="%s" onClick="goto(\'tn%s\');">\\2</span> <span class="comment2">\\3</span><pre>',i,i),  s1[i])
+#		s1[i]= gsub('(.*\\s*#=== )(.*)( =+.*)$',  sf('</pre>\\1<span class="H4" id="%s" onClick="goto(\'tn%s\');">\\2</span> <span class="comment2">\\3</span><pre>',i,i),  s1[i])
+#		s1[i]= gsub('(.*\\s*#== )(.*)( =+.*)$' ,  sf('</pre>\\1<span class="H3" id="%s" onClick="goto(\'tn%s\');">\\2</span> <span class="comment2">\\3</span><pre>',i,i),  s1[i])
+#		s1[i]= gsub('(.*\\s*#= )(.*)( =+.*)$'  ,  sf('</pre>\\1<span class="H2" id="%s" onClick="goto(\'tn%s\');">\\2</span> <span class="comment2">\\3</span><pre>',i,i),  s1[i])
+#		s1[i]= gsub('(.*\\s*#=+)([^=]*)$'      ,  sf('</pre>\\1<span class="H1" id="%s" onClick="goto(\'tn%s\');">\\2</span> <span class="comment2">\\3</span><pre>',i,i),  s1[i])
 		
-#		s1[i]= gsub('([\\s\\{]*###### )(.*)', sf('</pre>\\1<span class="H5" id="%s" onClick="goto(\'tn%1$s\');">\\2</span> <br/><pre>',i),  s1[i])
-#		s1[i]= gsub('([\\s\\{]*##### )(.*)' , sf('</pre>\\1<span class="H4" id="%s" onClick="goto(\'tn%1$s\');">\\2</span> <br/><pre>',i),  s1[i])
-#		s1[i]= gsub('([\\s\\{]*#### )(.*)'  , sf('</pre>\\1<span class="H3" id="%s" onClick="goto(\'tn%1$s\');">\\2</span> <br/><pre>',i),  s1[i])
-#		s1[i]= gsub('([\\s\\{]*### )(.*)'   , sf('</pre>\\1<span class="H2" id="%s" onClick="goto(\'tn%1$s\');">\\2</span> <br/><pre>',i),  s1[i])
-#		s1[i]= gsub('([\\s\\{]*## )(.*)'    , sf('</pre>\\1<span class="H1" id="%s" onClick="goto(\'tn%1$s\');">\\2</span> <br/><pre>',i),  s1[i])
+		s1[i]= gsub('(.*\\s*#===== )(.*)( =+.*)$', sf('</pre>\\1<span class="H5" id="%s" onClick="goto(\'tn%s\');">\\2</span> <span class="comment2">\\3</span><pre>',i,i),  s1[i])
+		s1[i]= gsub('(.*\\s*#==== )(.*)( =+.*)$',  sf('</pre>\\1<span class="H4" id="%s" onClick="goto(\'tn%s\');">\\2</span> <span class="comment2">\\3</span><pre>',i,i),  s1[i])
+		s1[i]= gsub('(.*\\s*#=== )(.*)( =+.*)$' ,  sf('</pre>\\1<span class="H3" id="%s" onClick="goto(\'tn%s\');">\\2</span> <span class="comment2">\\3</span><pre>',i,i),  s1[i])
+		s1[i]= gsub('(.*\\s*#== )(.*)( =+.*)$'  ,  sf('</pre>\\1<span class="H2" id="%s" onClick="goto(\'tn%s\');">\\2</span> <span class="comment2">\\3</span><pre>',i,i),  s1[i])
+		s1[i]= gsub('(.*\\s*#= )(.*)( =+.*)?$'  ,  sf('</pre>\\1<span class="H1" id="%s" onClick="goto(\'tn%s\');">\\2</span> <span class="comment2">\\3</span><pre>',i,i),  s1[i])
 		
 		s1[i]= gsub('(^[^#A-a0-9\\.\\,]*###### )(.*)', sf('</pre><span class="comment2">\\1</span><span class="H5" id="%s" onClick="goto(\'tn%1$s\');">\\2</span> <br/><pre>',i),  s1[i])
 		s1[i]= gsub('(^[^#A-a0-9\\.\\,]*##### )(.*)' , sf('</pre><span class="comment2">\\1</span><span class="H4" id="%s" onClick="goto(\'tn%1$s\');">\\2</span> <br/><pre>',i),  s1[i])
@@ -389,7 +392,7 @@ cc= code2HTML= code2HTMLjQuery= function(.theFile= get.theFile(), img='img', Ful
 	}	
 	
 	
-	if(classicHeaders) for(i in 1:5) {s1= gsub(sf('class="H%s"', i),  sf('class= "H%s"', 6-i), s1)} 
+	if(!classicHeaders) for(i in 1:5) {s1= gsub(sf('class="H%s"', i),  sf('class= "H%s"', 6-i), s1)} 
 	
 	#= div for code folding ===
 	depth= countDepth2(s1)
@@ -417,8 +420,8 @@ cc= code2HTML= code2HTMLjQuery= function(.theFile= get.theFile(), img='img', Ful
 	#==  prepare Table of Contents  ==	
 	toc= grep('img id=|<H\\d+|"H[1-5]', s1, value=TRUE)
 	toc= gsub('"capt"', '"captTOC"', toc)
-	toc= gsub('class="pic"', 'class="tnTOC"', toc)
-	toc= gsub('700', '400', toc)  		# pics -> thumbnails
+	toc= gsub('class="fig"', 'class="tnTOC"', toc)
+	toc= gsub('700', '400', toc)  		# figs -> thumbnails
 	toc= gsub('resize', 'goto', toc)
 	toc= gsub('id="(\\d+)"', 'id="tnTOC\\1"', toc)
 	toc= gsub("goto\\('tn(\\d+)'\\)", "goto('\\1')", toc)
@@ -429,28 +432,28 @@ cc= code2HTML= code2HTMLjQuery= function(.theFile= get.theFile(), img='img', Ful
 	
 	
 	#==  prepare Gallery  ==
-	pics= laply(na(picss), function(np){p=  picss[[np]]; sf('<img id="tn%s" class="imgGal" src="img/%s.png" name="%s" height=100> '
-						, np, gsub('.* (Pic_[0-9]+).*', '\\1', p)
+	figs= laply(na(figss), function(np){p=  figss[[np]]; sf('<img id="tn%s" class="imgGal" src="img/%s.png" name="%s" height=100> '
+						, np, gsub('.* ((Pic|Fig)_[0-9]+).*', '\\1', p)
 						, gsub('# *', '', p))})
 
 	#	    header.jQuery=....
 	#
 	#		footer=	'<div id= "show" style= "position: absolute; left:-1000px; top:1px; border:solid blue; padding:5; display:none; background-color:white; -moz-border-radius: 10px; border-radius: 10px;">
-	#				<img id="showPic" src="" height="400px" style="left:0px"/><br/>
+	#				<img id="showFig" src="" height="400px" style="left:0px"/><br/>
 	#				<span id="showTxt"></span>
 	#				</div></body></html>'
 	#
 	#		
 
 		out= c(header.jQuery, '		# <a href="#" id= "aToggleAll">Fold</a> All |
-				<a href="#" class= "aToggleAllPic">Toggle</a> all pics | 
+				<a href="#" class= "aToggleAllFig">Toggle</a> all figs | 
 				<a href="#" class= "aToggle TOC">Fold</a> contents |
 				<a href="#" class= "aToggle DD2">Fold</a> H2 |
 				<a href="#" class= "aToggle DD3">Fold</a> H3 |
 				<a href="#" class= "aToggle DD4">Fold</a> H4 |
 				<a href="#" class= "aToggleComments">ToggleComments</a> <span id="out"></span>
 				<div class="TOC" id="0"> <H3>Gallery for  ', .theFile, ' </H3>'
-			, pics, '<hr/><H2>Contents</H2>', toc, '<hr/></div> <p/><br/><br/>
+			, figs, '<hr/><H2>Contents</H2>', toc, '<hr/></div> <p/><br/><br/>
 			   <!-- pre --><div class="main">', main
 			, '</div><!-- /pre --><br>##   The HTML output of ', .theFile, ' was created on ', DT(), '; <a href="http://www.mathjax.org/demos/scaling-math/">test MathJax </a>'
 			, footer)
@@ -460,20 +463,20 @@ cc= code2HTML= code2HTMLjQuery= function(.theFile= get.theFile(), img='img', Ful
 			catf('expl("file://%s")', .theFile %+% outSuffix)
 			if(show) expl("file://" %+% .theFile %+% outSuffix)
 		}
-	invisible(list(theFile=.theFile, header=header.jQuery, pics=pics, toc=toc, main=main, footer=footer, out=out))
+	invisible(list(theFile=.theFile, header=header.jQuery, figs=figs, toc=toc, main=main, footer=footer, out=out))
 }
 #  cc()
 
 
 
 
-CleanSparePics= function() { #==  Clean spare Pics  ==
+CleanSpareFigs= function() { #==  Clean spare Figs  ==
 	ff=dir('.', 'png')
 	#~  [1] "Pic_1.png"      "Pic_10.png"     "Pic_11 (2).png" "Pic_11.png"     "Pic_12 (2).png" "Pic_12.png"     "Pic_13 (2).png" "Pic_13.png"     "Pic_14 (2).png" "Pic_14.png"     "Pic_15.png"     "Pic_16.png"     "Pic_17.png"     "Pic_18.png"     "Pic_19.png"     "Pic_20.png"     "Pic_21.png"     "Pic_22.png"     "Pic_23.png"     "Pic_24.png"     "Pic_25.png"     "Pic_26.png"     "Pic_27.png"     "Pic_28.png"     "Pic_29.png"     "Pic_3.png"      "Pic_31.png"     "Pic_32.png"     "Pic_33.png"     "Pic_34.png"     "Pic_35.png"     "Pic_36.png"     "Pic_37.png"     "Pic_38.png"     "Pic_39.png"     "Pic_4.png"      "Pic_40.png"     "Pic_41.png"     "Pic_43.png"     "Pic_44.png"     "Pic_45.png"     "Pic_46.png"     "Pic_47.png"     "Pic_48.png"     "Pic_49.png"     "Pic_50.png"     "Pic_51.png"     "Pic_52.png"     "Pic_53.png"     "Pic_54.png"     "Pic_55.png"     "Pic_6.png"      "Pic_7.png"      "Pic_8.png"      "Pic_9.png"     
 	
-	ps= gsub('^.*(Pic_\\d+).*$', '\\1', ff)
+	ps= gsub('^.*((Pic|Fig)_\\d+).*$', '\\1', ff)
 	s=readLines(theFile)
-	used= gsub('^.*(Pic_\\d+).*$', '\\1', grep('Pic_', s, value=TRUE))
+	used= gsub('^.*((Pic|Fig)_\\d+).*$', '\\1', grep('(Pic|Fig)_', s, value=TRUE))
 	spare= unique(nin(ps, used))
 	spare.files= laply(ff, function(f) any(laply(spare, function(s) grepl(s, f))))
 	any(laply(spare, function(s) grepl(s, 'Pic_1.png')))
@@ -525,7 +528,7 @@ if(0) RWJournals= MakeRWJournals(root='M:', patt='71_UseR-2013-Tutorial.*59.zz',
 		, exec=F, show=T, toSave=T, outSuffix='.b.htm')
 
 
-createRWJalbum= function(RWJournals, fout= '../all.Pic.htm', outSuffix= attr(.res, "par")$outSuffix){  # outSuffix='.b.htm', outSuffix='.htm') {
+createRWJalbum= function(RWJournals, fout= '../all.Fig.htm', outSuffix= attr(.res, "par")$outSuffix){  # outSuffix='.b.htm', outSuffix='.htm') {
 	out= c(RWJournals[[1]]$header
 			, sf('<script>
 					$(function(){
@@ -542,13 +545,13 @@ createRWJalbum= function(RWJournals, fout= '../all.Pic.htm', outSuffix= attr(.re
 					  });
 					</script>', outSuffix)
 			, unlist(llply(RWJournals, function(x)c(' <H3>Gallery <SMALL> for  ', (x$theFile), '</SMALL></H3>'  #basename(x$theFile)
-										, gsub('src="', sf(' alt="%s" src="file:///%1$s/../', x$theFile), x$pics)
+										, gsub('src="', sf(' alt="%s" src="file:///%1$s/../', x$theFile), x$figs)
 								)))
 			, RWJournals[[1]]$footer)
 	writeLines(out, fout)
 	expl(fout) ; catf('expl("%s")', tools:::file_path_as_absolute(fout))
 }	
-# createRWJalbum(RWJournals, fout='../all.Pic.35.htm')
+# createRWJalbum(RWJournals, fout='../all.Fig.35.htm')
 # createRWJalbum(RWJournals.42b, fout='../RAlbum.42b.htm', outSuffix='.htm')
 
 #' grep pattern in the file
@@ -794,7 +797,7 @@ if(0) { #= Jun 23, 2013
 		hee(srt(x, ~-Freq), 99)
 		in.zBase= unlist(strsplit(x$x, c('=', ' ')))
 		pas(in.zBase)
-		# [1] "` aaa ab all0 AllCategFreqDesc analQuantiles atl BA= BayesAvg calcc CategFreqDesc catf catt cc  code2HTML cc= code2HTMLjQuery classes CleanSparePics cn command CorrelCircle CorrelCircle3 CreateNewProj cumsumrev CV CVwt dropp DT= DateTime= timestamp dummy exec execf expl expls ext2 fDate fid fll fregTAG fromUNIXt fsize fsub gcc gf  gtf gff gna gnal=lgna gw gzfile hee  dhe heec heee  dsh hees heta hglm HHa HHd HHf HHInit HHp.bak HHp HHp  HHp2 HHp2 HHpm HHpr= HTMLp HHs HHt hist.pan hists hive_conn hLink hSel hSelC inte isNum JS  JaccardSimilarity last LastDayOfWeek lg1 libra libras Lift LiftWt LiftWtArr LiftWtArr.Old LiftWtArr LiftWtArr2 LiftWtArr3 lo logg logit loo lsDF lss lss0 maxn me merge3 MergeByName mn Model mt nc nc  nmsv  sNames ncc newwin newwin=  function( nmsv  sNames nonUnique nope norm norm0 nuc nuf nut one ord ord2 ordd pas plotGLMCoeff plotl plotm plott pr prinb princ PrintModel prr prrr renamee RF.Importance  RFI rmall rmDF rmmm ROC rou rows.with.na rt rtd rtsv rwith.na sa saa sc.pan sf shorts ShowColorNames showInOpera spectr SQL2vars= Scope2vars srt  sortt  sort.data.frame SS st summar sumn susp suss tab.df tab Timer tocsv toTe totsv toXL= ToXL upper.panel wc week wwc wws xscrollcommand yScore yScoreSc yscrollcommand zeval= evall zlog10 zlogit zqqplot zqqplotWt"
+		# [1] "` aaa ab all0 AllCategFreqDesc analQuantiles atl BA= BayesAvg calcc CategFreqDesc catf catt cc  code2HTML cc= code2HTMLjQuery classes CleanSpareFigs cn command CorrelCircle CorrelCircle3 CreateNewProj cumsumrev CV CVwt dropp DT= DateTime= timestamp dummy exec execf expl expls ext2 fDate fid fll fregTAG fromUNIXt fsize fsub gcc gf  gtf gff gna gnal=lgna gw gzfile hee  dhe heec heee  dsh hees heta hglm HHa HHd HHf HHInit HHp.bak HHp HHp  HHp2 HHp2 HHpm HHpr= HTMLp HHs HHt hist.pan hists hive_conn hLink hSel hSelC inte isNum JS  JaccardSimilarity last LastDayOfWeek lg1 libra libras Lift LiftWt LiftWtArr LiftWtArr.Old LiftWtArr LiftWtArr2 LiftWtArr3 lo logg logit loo lsDF lss lss0 maxn me merge3 MergeByName mn Model mt nc nc  nmsv  sNames ncc newwin newwin=  function( nmsv  sNames nonUnique nope norm norm0 nuc nuf nut one ord ord2 ordd pas plotGLMCoeff plotl plotm plott pr prinb princ PrintModel prr prrr renamee RF.Importance  RFI rmall rmDF rmmm ROC rou rows.with.na rt rtd rtsv rwith.na sa saa sc.pan sf shorts ShowColorNames showInOpera spectr SQL2vars= Scope2vars srt  sortt  sort.data.frame SS st summar sumn susp suss tab.df tab Timer tocsv toTe totsv toXL= ToXL upper.panel wc week wwc wws xscrollcommand yScore yScoreSc yscrollcommand zeval= evall zlog10 zlogit zqqplot zqqplotWt"
 	}
 
 	
@@ -1085,13 +1088,15 @@ if (0) {
 
 # do we need  HHInit ??
 #' wrapper for dev.print  -  save graphics to .png file
-sg= HHp= function(capt=.main, Width = dev.size(units = "px")[1] , off= T,  Height =  dev.size(units = "px")[2]
-		, GraphPointSize = 12, dirr='../img', type= "cairo", res=96, dev=0, fNameWithCapt=F, gg=F, ...){ # type= "windows"
+sg= HHp= saveGraphics= function(capt=.main, Width = dev.size(units = "px")[1] , off= T
+		, Height =  dev.size(units = "px")[2], GraphPointSize = 12, dirr='../img', type= "cairo"
+		, res=96, dev=0, fNameWithCapt=F, gg=F, ...){ # type= "windows"
 	op= options(); on.exit(options(op))  #; options(error=dummy)
 	if(!file.exists(dirr)) dir.create(dirr)
-	.iPic<<- max(0, nu(gsub('^Pic_(\\d+).*\\.png$', '\\1', dir(dirr, patt='.png$'))), na.rm=T)
-	# catt('--------------------------------------- HHp: old iPic=', .iPic)
-	GraphFileName=  if(fNameWithCapt) sf('Pic_%s. %s', .iPic<<- .iPic+1, capt) else  sf('Pic_%s', .iPic<<- .iPic+1)
+	.iFig= 1 + max(0, nu(gsub('^(Pic|Fig)_(\\d+).*\\.png$', '\\2', dir(dirr, patt='.png$'))), na.rm=T)
+	# catt('--------------------------------------- HHp: old iFig=', .iFig)
+	GraphFileName=  if(fNameWithCapt) sf('Fig_%s. %s', .iFig, capt) 
+	                else  sf('Fig_%s', .iFig)
 
 	AbsGraphFileName= sf('%s/%s/%s.png', gw(), dirr, GraphFileName)
 	catt('HHp: printing to ', AbsGraphFileName)
@@ -1207,10 +1212,10 @@ nope.rCharts= function()
 	# 	HH= function(p1=a) HHjp(p= p1, capt='', dirr='C:\\z\\eclipse\\R-2.14.2\\library\\rCharts\\az\\img')
 	
 
-	#'  save rCharts graphics to jPic_dd.htm file
+	#'  save rCharts graphics to jFig_dd.htm file
 	sgj= HHjp= function(p= p1, capt='', dirr='../img', absPath=T) {
-		.ijPic<<- max(0, nu(gsub('^jPic_(\\d+).*\\.htm$','\\1', dir(dirr, patt='.htm$'))), na.rm=T)
-		GraphFileName=  sf('jPic_%s', .ijPic<<- .ijPic+1)
+		.ijFig<<- max(0, nu(gsub('^jFig_(\\d+).*\\.htm$','\\1', dir(dirr, patt='.htm$'))), na.rm=T)
+		GraphFileName=  sf('jFig_%s', .ijFig<<- .ijFig+1)
 		AbsGraphFileName= if(absPath) sf('%s/%s.htm', dirr, GraphFileName)  else sf('%s/%s/%s.htm', gw(), dirr, GraphFileName)
 		p$save(AbsGraphFileName) 
 		catf('Saved to: expl("%s"). %s\n', AbsGraphFileName, capt)
@@ -1218,8 +1223,8 @@ nope.rCharts= function()
 		invisible(sf('%s. %s', GraphFileName, capt))
 	}
 	#e HHjp(p1)
-	# Saved to: expl("m:/80_ChurnSim/out/../img/jPic_10.htm"). 
-	# jPic_10. 	
+	# Saved to: expl("m:/80_ChurnSim/out/../img/jFig_10.htm"). 
+	# jFig_10. 	
 
 }
 
@@ -1355,7 +1360,9 @@ if(0){   #== Misc
 	gff('saved', theFile)
 	gff('sa\\(|===', theFile)
 
-	theFile='M:/50_HLP/out/packages/WorkJournal/inst/WorkJournal.r'
+	theFile='M:/50_HLP/out/packages/WorkJournal/inst/rcode/WorkJournal.r'
+	gff('pic', theFile)
+	gff('Pic', theFile)
 	gff('getQuoteCommentStatus', theFile)
 	gff('theFile', theFile)
 	

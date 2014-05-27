@@ -513,7 +513,8 @@ ReleaseOut= function(vers='', exec=F) {
 
 #' =  make RWJournals =
 #' res<<-  is  produced as a side effect for case of error in cycle!!!
-MakeRWJournals= function(root='T:', patt='.*', pattNeg='^$', exec=F, ...) {
+#en RWJournals= MakeRWJournals(root='M:', patt='71_UseR-2013-Tutorial.*59.zz', pattNeg='zExtraPacks|999|scripts|library|lib|fun|Base|code2HTML|86_testShiny', exec=F, show=T, toSave=T, outSuffix='.b.htm')
+MakeRWJournals= function(root='.', patt='.*', pattNeg='^$', exec=F, ...) {
 	warning('List res<<-  is produced as a side effect for case of error in cycle, if(exec) !!!')
 	.res= list(); attr(.res, "par")=list(...)
 	if(exec) res <<- .res
@@ -524,11 +525,15 @@ MakeRWJournals= function(root='T:', patt='.*', pattNeg='^$', exec=F, ...) {
 	}
 	invisible(.res)
 }
-if(0) RWJournals= MakeRWJournals(root='M:', patt='71_UseR-2013-Tutorial.*59.zz', pattNeg='zExtraPacks|999|scripts|library|lib|fun|Base|code2HTML|86_testShiny'
-		, exec=F, show=T, toSave=T, outSuffix='.b.htm')
 
-
-createRWJalbum= function(RWJournals, fout= '../all.Fig.htm', outSuffix= attr(.res, "par")$outSuffix){  # outSuffix='.b.htm', outSuffix='.htm') {
+#' create RWJ album  - galleries for all RWJ in a folder
+#p RWJournals - list of RWJ .html file names 
+#' @usage 
+#' RWJournals= MakeRWJournals(...)
+#' createRWJalbum(RWJournals)
+#en createRWJalbum(RWJournals, fout='../all.Fig.35.htm')
+#en createRWJalbum(RWJournals.42b, fout='../RAlbum.42b.htm', outSuffix='.htm')
+createRWJalbum= function(RWJournals, fout= '../all.Fig.htm', outSuffix= attr(RWJournals, "par")$outSuffix){  # outSuffix='.b.htm', outSuffix='.htm') {
 	out= c(RWJournals[[1]]$header
 			, sf('<script>
 					$(function(){
@@ -551,8 +556,7 @@ createRWJalbum= function(RWJournals, fout= '../all.Fig.htm', outSuffix= attr(.re
 	writeLines(out, fout)
 	expl(fout) ; catf('expl("%s")', tools:::file_path_as_absolute(fout))
 }	
-# createRWJalbum(RWJournals, fout='../all.Fig.35.htm')
-# createRWJalbum(RWJournals.42b, fout='../RAlbum.42b.htm', outSuffix='.htm')
+
 
 #' grep pattern in the file
 #e gff('= func', '^\\s*#', f=system.file('rcode/WorkJournal.r', package ='WorkJournal'))
@@ -1086,14 +1090,20 @@ if (0) {
 }
 
 
+#' first Free Fig Number
+#' e firstFreeFigN()
+firstFreeFigN= function(dirr='../img') nin(1:999, suppressWarnings(nu(gsub('^Fig_(\\d+).*\\.png$', '\\1', dir(dirr, patt='.png$')))))[1]
+
+
 # do we need  HHInit ??
 #' wrapper for dev.print  -  save graphics to .png file
-sg= HHp= saveGraphics= function(capt=.main, Width = dev.size(units = "px")[1] , off= T
+sg= saveGraphics= function(capt=.main, Width = dev.size(units = "px")[1] , off= T
 		, Height =  dev.size(units = "px")[2], GraphPointSize = 12, dirr='../img', type= "cairo"
 		, res=96, dev=0, fNameWithCapt=F, gg=F, ...){ # type= "windows"
 	op= options(); on.exit(options(op))  #; options(error=dummy)
 	if(!file.exists(dirr)) dir.create(dirr)
-	.iFig= 1 + max(0, nu(gsub('^(Pic|Fig)_(\\d+).*\\.png$', '\\2', dir(dirr, patt='.png$'))), na.rm=T)
+	#.iFig= 1 + max(0, nu(gsub('^(Pic|Fig)_(\\d+).*\\.png$', '\\2', dir(dirr, patt='.png$'))), na.rm=T)
+	.iFig= firstFreeFigN(dirr)
 	# catt('--------------------------------------- HHp: old iFig=', .iFig)
 	GraphFileName=  if(fNameWithCapt) sf('Fig_%s. %s', .iFig, capt) 
 	                else  sf('Fig_%s', .iFig)
@@ -1121,6 +1131,8 @@ sg= HHp= saveGraphics= function(capt=.main, Width = dev.size(units = "px")[1] , 
 	catf('%s. %s\n', GraphFileName, capt)
 	invisible(sf('%s. %s', GraphFileName, capt))
 }
+
+
 
 #' add title to the last graph, then save it.
 sgg= function(capt='', ...) {title(capt); sg(capt, ...)}

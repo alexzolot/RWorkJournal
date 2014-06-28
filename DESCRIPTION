@@ -1,15 +1,12 @@
-Package: WorkJournal
+Package: RWorkJournal
 Type: Package
 Title: R Work Journal and functions for work with code
-Version: 1.1
+Version: 0.2
 Date: 2014-05-12
 Author: Alex Zolotovitski <alex@zolot.us>
 Maintainer: Alex Zolotovitski <alex@zolot.us>
 Description: R Work Journal and Helper Funcs for work with code and file system
     for a book "Handling Large R Projects"
-Depends:
-    R (>= 3.0.2)
-Imports:
-    plyr,
-    HaLaP
+Depends: R (>= 3.0.2)
+Imports:  plyr, data.table, knitr, markdown, base64
 License: GPL-2

@@ -14,3 +14,13 @@ We wrote R function `Code2RWorkJournal()` that
 5.  Parts of the result html file could be folded. 
 6.  If in a browser you “select all”, copy and paste from browser to a text editor,   you get the pure original R file. 
 7.  If we modify `.R` code,   recreate `.html` is fast. 
+
+
+## In rel.02
+
+1. Full syntax highlight
+2. Added line numbers
+3. Use knitr::knit in the middle
+4. Added support for d3 js plots
+5. In addition to png - pdf plots, open on dblclk
+6. Dropped not-standard md #===, only standard  ####

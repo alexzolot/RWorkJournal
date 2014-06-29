@@ -1,3 +1,6 @@
 exportPattern("^[[:alpha:]]+")
-import(HaLaP)
+import(base64)
+import(data.table)
+import(knitr)
+import(markdown)
 import(plyr)

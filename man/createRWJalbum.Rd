@@ -2,10 +2,18 @@
 \alias{createRWJalbum}
 \title{createRWJalbum}
 \usage{
-createRWJalbum(RWJournals, fout = "../all.Pic.htm", outSuffix = attr(.res,
-  "par")$outSuffix)
+RWJournals= MakeRWJournals(...)
+createRWJalbum(RWJournals)
+}
+\arguments{
+  \item{RWJournals}{- list of RWJ .html file names}
 }
 \description{
-createRWJalbum
+create RWJ album - galleries for all RWJ in a folder
+}
+\examples{
+\dontrun{
+ createRWJalbum(RWJournals, fout='../all.Fig.35.htm')
+}
 }
 

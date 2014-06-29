@@ -6,6 +6,6 @@ fsub(fin = "M:/83_ScopeR/AegisCustomDataSourceView.script", fout = gsub("$",
   "-copy$", fin), fileShow = FALSE, overOut = TRUE, ...)
 }
 \description{
-fsub
+sub ... in file, used by CreateProj =
 }
 

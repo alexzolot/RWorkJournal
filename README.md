@@ -18,7 +18,7 @@ We wrote R function `Code2RWorkJournal()` that
 
 ### To install the package 
 
-1. Use command `devtools::install_github('alexzolot/RWorkJournal', ref='rel.0.2')` 
+1. Use command `devtools::install_github('alexzolot/RWorkJournal')` 
 2. To see demo, download [demo_RWJ.r](http://alexzolot.github.io/RWJ/demo_RWJ.r) to an empty directory, edit path in line 20 of the file, source the file, and then run `rwj()`. It should create file [demo_RWJ.r.htm](http://alexzolot.github.io/RWJ/demo_RWJ.r.htm) in the same folder and navigate your browser to it.
 
 

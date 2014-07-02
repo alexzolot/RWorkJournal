@@ -16,6 +16,7 @@ We wrote R function `Code2RWorkJournal()` that
 7.  If we modify `.R` code,   recreate `.html` is fast. 
 
 
+<<<<<<< HEAD
 ## In rel.02
 
 1. Full syntax highlight
@@ -24,3 +25,12 @@ We wrote R function `Code2RWorkJournal()` that
 4. Added support for d3 js plots
 5. In addition to png - pdf plots, open on dblclk
 6. Dropped not-standard md #===, only standard  ####
+
+
+### To install the package 
+
+1. Use command `devtools::install_github('alexzolot/RWorkJournal', ref='rel.0.2')` 
+2. To see demo, download [demo_RWJ.r](http://alexzolot.github.io/RWJ/demo_RWJ.r) to an empty directory, edit path in line 20 of the file, source the file, and then run `rwj()`. It should create file [demo_RWJ.r.htm](http://alexzolot.github.io/RWJ/demo_RWJ.r.htm) in the same folder and navigate your browser to it.
+
+
+>>>>>>> 2f8dda2d1dcbf0f51c78f101d110158d586d7bf2

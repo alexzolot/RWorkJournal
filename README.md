@@ -16,7 +16,6 @@ We wrote R function `Code2RWorkJournal()` that
 7.  If we modify `.R` code,   recreate `.html` is fast. 
 
 
-<<<<<<< HEAD
 ## In rel.02
 
 1. Full syntax highlight

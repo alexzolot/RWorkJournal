@@ -14,3 +14,11 @@ We wrote R function `Code2RWorkJournal()` that
 5.  Parts of the result html file could be folded. 
 6.  If in a browser you “select all”, copy and paste from browser to a text editor,   you get the pure original R file. 
 7.  If we modify `.R` code,   recreate `.html` is fast. 
+
+
+### To install the package 
+
+1. Use command `devtools::install_github('alexzolot/RWorkJournal', ref='rel.0.2')` 
+2. To see demo, download [demo_RWJ.r](http://alexzolot.github.io/RWJ/demo_RWJ.r) to an empty directory, edit path in line 20 of the file, source the file, and then run `rwj()`. It should create file [demo_RWJ.r.htm](http://alexzolot.github.io/RWJ/demo_RWJ.r.htm) in the same folder and navigate your browser to it.
+
+

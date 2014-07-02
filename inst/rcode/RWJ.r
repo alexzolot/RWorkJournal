@@ -94,6 +94,17 @@ wl= function(s=.Last.value, out, show=T, ...) { message(sf('\n\nwl to file: expl
 #e DT()
 DT= DateTime= function(format = "%Y-%m-%d %H:%M:%S") strftime(Sys.time(), format) 
 
+	onWin= nchar(Sys.getenv('computername')) > 0
+	ww= if(onWin)windows  else x11
+	nu= as.numeric
+	df= data.frame
+	#' x \ y
+	#r  x  which are not in  y
+	#e  nin(1:6, 4:9);  1:6 %-% 4:9
+	nin= '%-%' = function(x, y) x[!(x %in% y)] # x not in y :   1:5 %-%  4:9 # `%-%` 
+	
+	
+
 countDepth2= function(s= c('{{b}', 'n s{}', 'n s'), ch1='{', ch2='}', woComments=T){
   countChar1= function(s= c('{ {b}', 'n s{}', 'n s'), ch1='{') nchar(gsub(sf('[^%s]',ch1), '', s))
   

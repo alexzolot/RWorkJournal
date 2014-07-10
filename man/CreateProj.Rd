@@ -13,7 +13,7 @@ Create New Project from template
 }
 \examples{
 \dontrun{
-  CreateNewProj(newProj.name= '96_aaaa',  root='../../')
+  CreateNewProj(newProj.name= '01_aaaa', root='m:'); sw('../..')
 }
 }
 

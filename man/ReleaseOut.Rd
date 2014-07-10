@@ -2,7 +2,7 @@
 \alias{ReleaseOut}
 \title{ReleaseOut}
 \usage{
-ReleaseOut(vers = "", exec = FALSE)
+ReleaseOut(theFile, vers = "", exec = FALSE)
 }
 \description{
 ReleaseOut

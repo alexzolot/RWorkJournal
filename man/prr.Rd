@@ -5,6 +5,9 @@
 prr(x, ma = "", header = TRUE)
 }
 \description{
-Created : 2013-06-24 02:55:55
+print list in 1 column
+}
+\examples{
+prr(letters[1:5])
 }
 

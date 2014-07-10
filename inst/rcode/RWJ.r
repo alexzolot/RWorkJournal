@@ -84,7 +84,7 @@ sw= function (sDir, ...) {
 gw= function(){catf('gw: sw("%s");  expl()\n', gw<- getwd()); invisible(gw)} 
 
 
-#'w writeLines
+#w writeLines
 wl= function(s=.Last.value, out, show=T, ...) { message(sf('\n\nwl to file: expl("file://%s")\n', out))
 	writeLines(s, out, ...)
 	if(show) expl(sf("file://%s", normalizePath(out)))
@@ -264,7 +264,10 @@ get.theFile= function() {
 		
 		sing.quo= regexpr('^\\s*([\'"`])\\s*$', s)
 		q1= gre2('^\\s*[\'"`]', '^\\s*([\'"`]).*\\1', s, v=F)  # line start quote
-		q2= gre2('[\'"`]\\s*$', "(['\"`]).*\\1\\s*$|#'\\s*$", s, v=F)  # line end quote, not roxygen
+		#q2= gre2('[\'"`]\\s*$', "(['\"`]).*\\1\\s*$|#'\\s*$", s, v=F)  # line end quote, not roxygen
+		#q2= gre2('[\'"`]\\s*$', "\\1.*(['\"`])\\s*$|#'\\s*$", s, v=F)  # line end quote, not roxygen
+		#q2= gre2('[\'"`]\\s*$', "(.*['\"`]){2,}\\s*$", s, v=F)  # line end quote, not roxygen
+		q2= gre2('[^#][\'"`]\\s*$', "('.*'|\".*\"|`.*`)\\s*$", s, v=F)  # line end quote, not roxygen
 		
 		ich= cumsum(q2 | q1)  # chunk index
 		iich= ich - ifelse(ich%%2, 0, c(0, diff(ich)))  # chunk index, from 0; 0 is.code
@@ -284,6 +287,9 @@ get.theFile= function() {
 			ss[,  s2:=  gsub('(^|[^x"])@', '\\1\\\\', gsub('@@', '\\\\\\\\', s2))]  # escapes for LaTeX @ -> \
 			#wl(ss$s2, .file %+% '.rmd')
 		}
+		options(datatable.print.nrows=600)
+		print(ss)
+		a.<<- ss   #xxx
 		
 		rmd= ss$s2
 		
@@ -485,11 +491,11 @@ cl("e.src= " + e.src);
 				</script>
 				'
 		css='	<style scoped>  /*  www.w3schools.com/cssref/css_colornames.asp  www.tizag.com/cssT/border.php */
-				body {max-width: 95%; font-size: 100%; line-height: 105%;}
+				//body {max-width: 95%; font-size: 100%; line-height: 100%;}
 				div.Gallery {background-color:rgb(255,248,248); }	
 				div.TOC {background-color:rgb(248,248,255); }	
 				div.main, .r {font-family: monospace; white-space: pre; max-width: 1000px}
-				p{margin-bottom:2%; margin-top:2%;margin-before: 2%; margin-after: 2%;}
+				//p{margin-bottom:2%; margin-top:2%;margin-before: 2%; margin-after: 2%;}
 				code {border: 0px}
 				pre  {border: 1px solid}
 				
@@ -506,6 +512,7 @@ cl("e.src= " + e.src);
 				.TOC.H1, H3, .H3 {font-size:200%;  margin-top:15px;  margin-bottom:3px;  margin-left:40px;}
 				.TOC.H2, H4, .H4 {font-size:150%;  margin-top:12px;  margin-bottom:2px;  margin-left:60px;}
 				.TOC.H3, H5, .H5 {font-size:120%;  margin-top:10px;  margin-bottom:1px;  margin-left:80px;}
+				.TOC.H4, H6, .H6 {font-size:105%;  margin-top:7px;  margin-bottom:1px;  margin-left:100px;}
 				img.fig, .captTOC, img.tnTOC {margin-top:0px;   margin-bottom:0px;  margin-left:10px;} 
 				.TOC.H1, .TOC.H2, .TOC.H3, .TOC.H4, .TOC.H5, span.captTOC, img.tnTOC { display:block;}
 				.D77 { display:inline; }
@@ -600,20 +607,22 @@ cl("e.src= " + e.src);
 #		s= gsub('^(.*id="sp(\\d+)".*# )(Fig_\\d+)(.*?)(</span.*)'
 #				, '<br/></code><code class="r"><img id="fig\\2" class="fig" src="img/\\3.png" width=700 alt="\\3\\4"/>   
 #						<br/><span class="capt">\\3\\4</span><br/>', s)
-		s= gsub('^(.*id="sp(\\d+)".*# )(Fig_\\d+)(.*)'
-				, '<br/></code><code class="r"><img id="fig\\2" class="fig" src="img/\\3.png" width=700 alt="\\3\\4"/>   
+#s= gsub('^(.*id="sp(\\d+)".*# )(Fig_\\d+)(.*)'
+				s= gsub('^(.*id="sp(\\d+)".*# )(Fig_\\d+)([^<>]*)'
+								, '<br/></code><code class="r"><img id="fig\\2" class="fig" src="img/\\3.png"
+								 width=700 alt="\\3\\4"/>   
 						<br/><span class="capt">\\3\\4</span><br/>', s)
 		#' js figs (d3)
-		s= gsub('^(.*id="sp(\\d+)".*# )(jFig_\\d+)(.*)'
+		s= gsub('^(.*id="sp(\\d+)".*# )(jFig_\\d+)([^<>]*)'
 				, '<br/></code><code class="r"><iframe id="fig\\2" class="jfig" src="img/\\3.htm" width="100%"  height="600px" name="\\3\\4"></iframe>  
 						<br/><span class="capt">\\3\\4</span><br/>', s)
 		
 		#' treat Pics
-		s= gsub('^(.*id="sp(\\d+)".*# )(Pic_\\d+)(.*)'
+		s= gsub('^(.*id="sp(\\d+)".*# )(Pic_\\d+)([^<>]*)'
 				, '<br/></code><code class="r"><img id="fig\\2" class="fig" src="img/\\3.png" width=700 alt="\\3\\4"/>   
 						<br/><span class="capt">\\3\\4</span><br/>', s)
 		#' js figs (d3)
-		s= gsub('^(.*id="sp(\\d+)".*# )(jPic_\\d+)(.*)'
+		s= gsub('^(.*id="sp(\\d+)".*# )(jPic_\\d+)([^<>]*)'
 				, '<br/></code><code class="r"><iframe id="fig\\2" class="jfig" src="img/\\3.htm" width="100%"  height="600px" name="\\3\\4"></iframe>  
 						<br/><span class="capt">\\3\\4</span><br/>', s)
 
@@ -648,7 +657,7 @@ cl("e.src= " + e.src);
 		#brr()
 		prr(s[hh1$i])
 		
-		hh= get.r.headers(s, find='(<span id="sp(\\d+)".*\\s*##+ )(.*)( =+.*)?$', patt.le='##+ '
+		hh= get.r.headers(s, find='(<span id="sp(\\d+)".*\\s*##+ )(.*?)( =+.*)?$', patt.le='##+ '
 				, replace='\\1<span class="H%s" id="\\2" title="\\2">\\3</span> <span class="comment2">\\4</span>')
 		s[hh$i]= hh$s2
 		#wl(s, theFile %+% '.3.kn.htm')
@@ -663,20 +672,34 @@ cl("e.src= " + e.src);
 		
 		imgFold= '<img src="" alt="-" class="fold" />'
 		
-		s1= ifelse(depth!= 0, gsub('^(<span id=.sp(\\d+)[^#]*\\{[^\\{\\}]*)'
-						, '\\1 <a href="javascript:ToggleFold(\\2)" id="asp\\2"><img src="" alt="-" class="fold" /></a>
-								</code></pre><div class="D-fold" id="D\\2"><pre><code class="r div">', s1), s1)
 		
-		s1= gsub('^(.* class="H(\\d)".* id="(\\d+).*)D-fold(.*) class="D-fold"' , '\\1D\\3\\4 class="D\\2" id="D\\3"', s1)
-		s1= ifelse(depth!= 0, gsub('([^#\\{\\}]*)\\}', '\\1<b>}</b></code></pre></div><pre><code class="r fold">', s1), s1)
+		if (`split fold divs`<- 0) {
+			s1= ifelse(depth!= 0, gsub('^(<span id=.sp(\\d+)[^#]*\\{[^\\{\\}]*)'
+							, '\\1 <a href="javascript:ToggleFold(\\2)" id="asp\\2"><img src="" alt="-" class="fold" /></a>
+									</code></pre><div class="D-fold" id="D\\2"><pre><code class="r div">', s1), s1)
+			
+			s1= gsub('^(.* class="H(\\d)".* id="(\\d+).*)D-fold(.*) class="D-fold"' , '\\1D\\3\\4 class="D\\2" id="D\\3"', s1)
+			s1= ifelse(depth!= 0, gsub('([^#\\{\\}]*)\\}', '\\1<b>}</b></code></pre></div><pre><code class="r fold">', s1), s1)
+			
+		}else{
+			s1= ifelse(depth!= 0, gsub('^(<span id=.sp(\\d+)[^#]*\\{[^\\{\\}]*)'
+							, '\\1 <a href="javascript:ToggleFold(\\2)" id="asp\\2"><img src="" alt="-" class="fold" /></a>
+									<div class="D-fold" id="D\\2">', s1), s1)
+			
+			s1= gsub('^(.* class="H(\\d)".* id="(\\d+).*)D-fold(.*) class="D-fold"' , '\\1D\\3\\4 class="D\\2" id="D\\3"', s1)
+			s1= ifelse(depth!= 0, gsub('([^#\\{\\}]*)\\}', '\\1<b>}</b></div>', s1), s1)
+			
+		}
+		
+		
 		
 		#==  prepare Gallery  ==
 		#figs= gre2('# (Pic|Fig)_\\d+',, s1) # prr(figs)
 #figs= gre2('class="fig"',, s1) # prr(figs)
 #figs= sub('.*(<img id=".*?>).*','\\1', figs) # prr(gal)
 
-figs= gre2('class="j?fig"',, s1) # prr(figs)
-figs= sub('.*(<img id=".*?>).*','\\1', figs) # prr(gal)
+figs= gre2('class="j?fig"',, s1) ; prr(figs)
+figs= sub('.*(<img id=".*?>).*','\\1', figs) ; prr(figs)
 figs= sub('.*(<iframe id=".*?iframe>).*','\\1', figs) # prr(gal)
 
 figs= sub('class="jfig"','class="imgGal"', sub('width="100%"  height="600px"', 'width=300 height=140 style="-ms-zoom: 0.25"', figs))
@@ -698,7 +721,9 @@ figs= sub('class="jfig"','class="imgGal"', sub('width="100%"  height="600px"', '
 		toc= gsub('.*(<span class="H.*?)=* *</span>.*', '<br/>\\1</span>', toc)  # clean <H>
 		toc= sub('.*(<img id=".* alt="(.*?)").*', '\\1 title="\\2"/>', toc) # clean fig
 		toc= sub('.*(<iframe id=".*) name="(.*?)"(.*iframe>).*', '\\1 title="\\2"\\3', toc) # clean fig
-		toc= sub('width="100%"  height="600px"', 'width=300 height=140 style="-ms-zoom: 0.25"', toc) # clean fig
+		#toc= sub('width="100%"  height="600px"', 'width=300 height=140 style="-ms-zoom: 0.25"', toc) # clean fig
+		toc= sub('width=".*?"  height=".*?"', 'width=300 height=140 style="-ms-zoom: 0.25"', toc) # clean fig
+		toc= sub(' width=.*? ', ' height=140 ', toc) # clean fig
 		toc= sub(' id="', ' id="TOC', toc) # clean fig
 		
 		
@@ -968,12 +993,13 @@ fsub= function(fin="M:/83_ScopeR/AegisCustomDataSourceView.script"
 
 #' sub of multiple patterns in multiple files
 #' res<<-  is  produced as a side effect for case of error in cycle!!!
-gsubInFiles= function(root='T:', patt='\\.r\\.htm', pattRepl='\\.r\\.htm', pattOutSub='\\.r\\.OO\\.htm', pattNeg='^$', exec=F, ...) {
+gsubInFiles= function(root='T:', patt='\\.r\\.htm', pattRepl='\\.r\\.htm'
+		, pattOutSub='\\.r\\.OO\\.htm', pattNeg='^$', exec=F, ...) {
 	#warning('FilesSub produces a side effect if(exec) !!!')
 	ff= gre2(patt, pattNeg, dir(root, all.files =T, patt=patt, recursive= T))
 	prr(ff)
 	for(f in gre2(patt, pattNeg, dir(root, all.files =T, patt=patt, recursive= T))) {
-		fa=	tools:::file_path_as_absolute(f)
+		fa=	tools:::file_path_as_absolute(fp(root,f))
 		faOut= gsub(pattRepl, pattOutSub, fa)
 		catt(fa, ' --> ', faOut)
 		if(exec){

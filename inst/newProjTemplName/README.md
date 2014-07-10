@@ -1,7 +1,7 @@
 newProjTemplName
 ================
 
-    Author : Alex Zolotoviski, azolotovitski@medio.com
+    Author : Alex Zolotoviski, alex.zolot@here.com
 
     Created: 00-00-00
     

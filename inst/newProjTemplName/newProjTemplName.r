@@ -1,4 +1,4 @@
-#! /usr/bin/Rscript --vanilla --slave
+#! /usr/bin/Rscript 
 # Project  : newProjTemplName
 # File     : newProjTemplName/newProjTemplName.r
 # Author   : Alex Zolotoviski, azolotovitski@medio.com
@@ -9,20 +9,27 @@
 { #== init ===
 	rm(list=ls(envir = .GlobalEnv), envir = .GlobalEnv)
 	
-	options(help='html', digits=4, width=2160, scipen=5, editor='C:\\Program Files (x86)\\Notepad++\\notepad++.exe'
-			, error= NULL) # options(error= recover) options(error=dump)  #or options(error=NULL)
+	options(help='html', digits=4, width=2160, scipen=5, editor='C:\\Program Files (x86)\\Notepad++\\notepad++.exe')
+	options(error= NULL)  # options(error= recover) options(error=dump) 
 
 	onWin= Sys.getenv('R_PLATFORM')==''
 	if(onWin){root= 'T:/work/UseR-2013'; 	memory.limit(size=9000)}  else root= '/home/azolotovitski/work'   # memory.limit()
 	
+	library(HaLaP)
+	library(WorkJournal)
+	
+	if(fromSrc <- 1) source('m:/50_HLP/out/packages/HaLaP/inst/rcode/HLP.r') # T:/work/UseR-2013/lib/zBase0.r
+	if(fromSrc <- 1) source('m:/50_HLP/out/packages/RWorkJournal/inst/rcode/RWJ.r') # T:/work/UseR-2013/lib/zCode.r
+
+	
 	#source(file.path(root, 'lib/zBase0.r'))  
-	source('T:/work/UseR-2013/lib/zBase0.r')  # xxx: hard coded path to zBase.r
-	source('T:/work/UseR-2013/lib/zBase1.r')  
+	source('T:/work/UseR-2013/lib/zBase1.r')   # xxx: hard coded path to zBase.r
 	source('T:/work/UseR-2013/lib/zCode.r')  
 	source('T:/work/UseR-2013/lib/zStats.r')  
-	source('T:/work/UseR-2013/newProjTemplName/newProjTemplName.fun.r')  
+	source('M:/newProjTemplName/newProjTemplName.fun.r')  
 	
 	libra(plyr) 
+	libra(data.table)
 	#libra(R2HTML) 
 	#libra(XLConnect)
 	
@@ -46,30 +53,30 @@
 		
 	theFile= fp(proot, 'newProjTemplName.r')
 	
-	HHp.bak= HHp #; HHp=dummy; # HHp= HHp.bak   # to rerun w/o change images
-	sa.bak= sa   #; sa=dummy ; # sa= sa.bak   # to rerun w/o change images
+	sg.bak= sg    # ; sg=dummy ; # sa= sa.bak   # to rerun w/o change images
+	sgg.bak= sgg  # ; sgg=dummy; # sa= sa.bak   # to rerun w/o change images
+	sa.bak= sa    # ; sa=dummy ; # sa= sa.bak   # to rerun w/o change images
+	saa.bak= saa  # ; saa=dummy; # sa= sa.bak   # to rerun w/o change images
 
-	
-	# catf('\ndetach("%s",  character.only = TRUE)', grep('^pac', search(), v=T))
-	# gff('saved', theFile)
-	# rmDF(); loo(); lo(); lsDF();
+	# rmDF(); gff('saved'); loo(); lo(); lsDF(); dett(); gw(); tables(); loo('xx'); loo('evs')
 } #--
 ##########################################################
+'
+#   newProjTemplName  
+'
 
-#====   newProjTemplName  ====
-
-if(0){#== Data Inventory  ==
+if(0){#==  Data Inventory  ==
 	gw() 
 	dir() # expl() 
 }
 
-{#== Data Exploration  ==
+{#==  Data Exploration  ==
 }
 
-{#== Predictive Modeling ==
+{#==  Predictive Modeling  ==
 }
 
-{#== Reports ==
+{#==  Reports  ==
 }
 
 
@@ -79,7 +86,6 @@ if(0){   #== Misc
 	gff('sa\\(|===', theFile)
 	
 	theFile= fp(proot, 'newProjTemplName.r')
-	ccc= function()code2HTML(theFile)
 	
-	CreateNewProj(newProj.name= 'zzz', Templ.dir= 'T:/work/UseR-2013/lib/newProjTemplNa me', root='T:/work/UseR-2013')
+	CreateNewProj(newProj.name= '___zzz', Templ.dir= 'M:/50_HLP/out/packages/RWorkJournal/inst/newProjTemplName', root='m:')
 } #--

@@ -2,9 +2,12 @@
 \alias{cn}
 \title{cn}
 \usage{
-cn(cnn, sep = "[ ,\\n\\t\\\\+]+")
+cn(cnn, sep = "[ , \\n\\t\\\\+]+")
 }
 \description{
-cn
+fun to split column names
+}
+\examples{
+cn('aa bb 2013')
 }
 

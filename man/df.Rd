@@ -1,0 +1,230 @@
+\name{df}
+\alias{df}
+%- Also NEED an '\alias' for EACH other topic documented here.
+\title{
+%%  ~~function to do ... ~~
+}
+\description{
+%%  ~~ A concise (1-5 lines) description of what the function does. ~~
+}
+\usage{
+df(..., row.names = NULL, check.rows = FALSE, check.names = TRUE, stringsAsFactors = default.stringsAsFactors())
+}
+%- maybe also 'usage' for other objects documented here.
+\arguments{
+  \item{\dots}{
+%%     ~~Describe \code{\dots} here~~
+}
+  \item{row.names}{
+%%     ~~Describe \code{row.names} here~~
+}
+  \item{check.rows}{
+%%     ~~Describe \code{check.rows} here~~
+}
+  \item{check.names}{
+%%     ~~Describe \code{check.names} here~~
+}
+  \item{stringsAsFactors}{
+%%     ~~Describe \code{stringsAsFactors} here~~
+}
+}
+\details{
+%%  ~~ If necessary, more details than the description above ~~
+}
+\value{
+%%  ~Describe the value returned
+%%  If it is a LIST, use
+%%  \item{comp1 }{Description of 'comp1'}
+%%  \item{comp2 }{Description of 'comp2'}
+%% ...
+}
+\references{
+%% ~put references to the literature/web site here ~
+}
+\author{
+%%  ~~who you are~~
+}
+\note{
+%%  ~~further notes~~
+}
+
+%% ~Make other sections like Warning with \section{Warning }{....} ~
+
+\seealso{
+%% ~~objects to See Also as \code{\link{help}}, ~~~
+}
+\examples{
+##---- Should be DIRECTLY executable !! ----
+##-- ==>  Define data, use random,
+##--	or do  help(data=index)  for the standard data sets.
+
+## The function is currently defined as
+function (..., row.names = NULL, check.rows = FALSE, check.names = TRUE, 
+    stringsAsFactors = default.stringsAsFactors()) 
+{
+    data.row.names <- if (check.rows && is.null(row.names)) 
+        function(current, new, i) {
+            if (is.character(current)) 
+                new <- as.character(new)
+            if (is.character(new)) 
+                current <- as.character(current)
+            if (anyDuplicated(new)) 
+                return(current)
+            if (is.null(current)) 
+                return(new)
+            if (all(current == new) || all(current == "")) 
+                return(new)
+            stop(gettextf("mismatch of row names in arguments of 'data.frame', item \%d", 
+                i), domain = NA)
+        }
+    else function(current, new, i) {
+        if (is.null(current)) {
+            if (anyDuplicated(new)) {
+                warning(gettextf("some row.names duplicated: \%s --> row.names NOT used", 
+                  paste(which(duplicated(new)), collapse = ",")), 
+                  domain = NA)
+                current
+            }
+            else new
+        }
+        else current
+    }
+    object <- as.list(substitute(list(...)))[-1L]
+    mirn <- missing(row.names)
+    mrn <- is.null(row.names)
+    x <- list(...)
+    n <- length(x)
+    if (n < 1L) {
+        if (!mrn) {
+            if (is.object(row.names) || !is.integer(row.names)) 
+                row.names <- as.character(row.names)
+            if (anyNA(row.names)) 
+                stop("row names contain missing values")
+            if (anyDuplicated(row.names)) 
+                stop(gettextf("duplicate row.names: \%s", paste(unique(row.names[duplicated(row.names)]), 
+                  collapse = ", ")), domain = NA)
+        }
+        else row.names <- integer()
+        return(structure(list(), names = character(), row.names = row.names, 
+            class = "data.frame"))
+    }
+    vnames <- names(x)
+    if (length(vnames) != n) 
+        vnames <- character(n)
+    no.vn <- !nzchar(vnames)
+    vlist <- vnames <- as.list(vnames)
+    nrows <- ncols <- integer(n)
+    for (i in seq_len(n)) {
+        xi <- if (is.character(x[[i]]) || is.list(x[[i]])) 
+            as.data.frame(x[[i]], optional = TRUE, stringsAsFactors = stringsAsFactors)
+        else as.data.frame(x[[i]], optional = TRUE)
+        nrows[i] <- .row_names_info(xi)
+        ncols[i] <- length(xi)
+        namesi <- names(xi)
+        if (ncols[i] > 1L) {
+            if (length(namesi) == 0L) 
+                namesi <- seq_len(ncols[i])
+            if (no.vn[i]) 
+                vnames[[i]] <- namesi
+            else vnames[[i]] <- paste(vnames[[i]], namesi, sep = ".")
+        }
+        else {
+            if (length(namesi)) 
+                vnames[[i]] <- namesi
+            else if (no.vn[[i]]) {
+                tmpname <- deparse(object[[i]])[1L]
+                if (substr(tmpname, 1L, 2L) == "I(") {
+                  ntmpn <- nchar(tmpname, "c")
+                  if (substr(tmpname, ntmpn, ntmpn) == ")") 
+                    tmpname <- substr(tmpname, 3L, ntmpn - 1L)
+                }
+                vnames[[i]] <- tmpname
+            }
+        }
+        if (mirn && nrows[i] > 0L) {
+            rowsi <- attr(xi, "row.names")
+            nc <- nchar(rowsi, allowNA = FALSE)
+            nc <- nc[!is.na(nc)]
+            if (length(nc) && any(nc)) 
+                row.names <- data.row.names(row.names, rowsi, 
+                  i)
+        }
+        nrows[i] <- abs(nrows[i])
+        vlist[[i]] <- xi
+    }
+    nr <- max(nrows)
+    for (i in seq_len(n)[nrows < nr]) {
+        xi <- vlist[[i]]
+        if (nrows[i] > 0L && (nr\%\%nrows[i] == 0L)) {
+            xi <- unclass(xi)
+            fixed <- TRUE
+            for (j in seq_along(xi)) {
+                xi1 <- xi[[j]]
+                if (is.vector(xi1) || is.factor(xi1)) 
+                  xi[[j]] <- rep(xi1, length.out = nr)
+                else if (is.character(xi1) && inherits(xi1, "AsIs")) 
+                  xi[[j]] <- structure(rep(xi1, length.out = nr), 
+                    class = class(xi1))
+                else if (inherits(xi1, "Date") || inherits(xi1, 
+                  "POSIXct")) 
+                  xi[[j]] <- rep(xi1, length.out = nr)
+                else {
+                  fixed <- FALSE
+                  break
+                }
+            }
+            if (fixed) {
+                vlist[[i]] <- xi
+                next
+            }
+        }
+        stop(gettextf("arguments imply differing number of rows: \%s", 
+            paste(unique(nrows), collapse = ", ")), domain = NA)
+    }
+    value <- unlist(vlist, recursive = FALSE, use.names = FALSE)
+    vnames <- unlist(vnames[ncols > 0L])
+    noname <- !nzchar(vnames)
+    if (any(noname)) 
+        vnames[noname] <- paste("Var", seq_along(vnames), sep = ".")[noname]
+    if (check.names) 
+        vnames <- make.names(vnames, unique = TRUE)
+    names(value) <- vnames
+    if (!mrn) {
+        if (length(row.names) == 1L && nr != 1L) {
+            if (is.character(row.names)) 
+                row.names <- match(row.names, vnames, 0L)
+            if (length(row.names) != 1L || row.names < 1L || 
+                row.names > length(vnames)) 
+                stop("'row.names' should specify one of the variables")
+            i <- row.names
+            row.names <- value[[i]]
+            value <- value[-i]
+        }
+        else if (!is.null(row.names) && length(row.names) != 
+            nr) 
+            stop("row names supplied are of the wrong length")
+    }
+    else if (!is.null(row.names) && length(row.names) != nr) {
+        warning("row names were found from a short variable and have been discarded")
+        row.names <- NULL
+    }
+    if (is.null(row.names)) 
+        row.names <- .set_row_names(nr)
+    else {
+        if (is.object(row.names) || !is.integer(row.names)) 
+            row.names <- as.character(row.names)
+        if (anyNA(row.names)) 
+            stop("row names contain missing values")
+        if (anyDuplicated(row.names)) 
+            stop(gettextf("duplicate row.names: \%s", paste(unique(row.names[duplicated(row.names)]), 
+                collapse = ", ")), domain = NA)
+    }
+    attr(value, "row.names") <- row.names
+    attr(value, "class") <- "data.frame"
+    value
+  }
+}
+% Add one or more standard keywords, see file 'KEYWORDS' in the
+% R documentation directory.
+\keyword{ ~kwd1 }
+\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line

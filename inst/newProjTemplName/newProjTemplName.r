@@ -1,7 +1,7 @@
 #! /usr/bin/Rscript 
 # Project  : newProjTemplName
 # File     : newProjTemplName/newProjTemplName.r
-# Author   : Alex Zolotoviski, azolotovitski@medio.com
+# Author   : Alex Zolotoviski
 # Created  : 00-00-00
 # License  : GPL-2
 ###############################################################################
@@ -13,7 +13,7 @@
 	options(error= NULL)  # options(error= recover) options(error=dump) 
 
 	onWin= Sys.getenv('R_PLATFORM')==''
-	if(onWin){root= 'T:/work/UseR-2013'; 	memory.limit(size=9000)}  else root= '/home/azolotovitski/work'   # memory.limit()
+	if(onWin){root= 'm:'; 	memory.limit(size=24000)}  else root= '/home/zolotovi/work'   # memory.limit()
 	
 	library(HaLaP)
 	library(WorkJournal)
@@ -30,11 +30,12 @@
 	
 	libra(plyr) 
 	libra(data.table)
+	libra(SOAR); srm= Store # Ls(); Attach(); Search(); loo(); vignette("SOAR") 
 	#libra(R2HTML) 
 	#libra(XLConnect)
 	
 	libra(RColorBrewer)  # display.brewer.all()
-	palette(c(adjustcolor(cn('grey50 green3 red2'), alpha.f = .6), brewer.pal(8,"Dark2")))  ##ex: plot(1:19, pch=16, col=1:19, cex=3)
+	palette(c(adjustcolor(cn('grey50 blue3 red2'), alpha.f = .6), brewer.pal(8,"Dark2")))  # plot(1:19, pch=16, col=1:19, cex=3)
 	
 	#libra(Defaults)
 	#	setDefaults(legend, bty='n')
@@ -70,22 +71,21 @@ if(0){#==  Data Inventory  ==
 	dir() # expl() 
 }
 
-{#==  Data Exploration  ==
+if(0){#==  Data Exploration  ==
 }
 
-{#==  Predictive Modeling  ==
+if(0){#==  Predictive Modeling  ==
 }
 
-{#==  Reports  ==
+if(0){#==  Reports  ==
 }
 
 
-if(0){   #== Misc
+if(0){#=== Misc
+	theFile= fp(proot, 'newProjTemplName.r')
 	theFile= 'm:/newProjTemplName/newProjTemplName.r'
 	gff('saved', theFile)
 	gff('sa\\(|===', theFile)
-	
-	theFile= fp(proot, 'newProjTemplName.r')
 	
 	CreateNewProj(newProj.name= '___zzz', Templ.dir= 'M:/50_HLP/out/packages/RWorkJournal/inst/newProjTemplName', root='m:')
 } #--

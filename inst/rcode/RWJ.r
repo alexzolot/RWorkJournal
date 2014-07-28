@@ -18,17 +18,23 @@
 
 #' Created  : 2014-06-18 02:55:55
 
-stopifnot(require(plyr))
-stopifnot(require(knitr))
-stopifnot(require(markdown))
-stopifnot(require(base64))
-#libra(data.table); 
-stopifnot(require(data.table))
+#stopifnot(require(plyr)      )
+#stopifnot(require(knitr)     )
+#stopifnot(require(markdown)  )
+#stopifnot(require(base64)    )
+#stopifnot(require(data.table))
+##libra(data.table); 
+require(plyr)      
+require(knitr)     
+require(markdown)  
+require(base64)    
+require(data.table)
+
 dtt= data.table; ad= as.IDate; taa= tables  # vignette("datatable-faq")
 options(datatable.print.nrows=100)
 
 
-### from HaLaP
+###  from HaLaP
 '%+%' = paste0
 ch= as.character
 na= names
@@ -57,7 +63,7 @@ catf= function(...) cat(sprintf(...))
 gre2= function(patt='', pattNeg='^$', x, v=T, ...){ a=grepl(patt, x,...) & !grepl(pattNeg, x,...); return( if(v) x[a] else a) }
 
 #w str
-#'e strr(cars)
+#e strr(cars)
 strr= function(x) {catf('\nstr(%s):\n', desu(x)); str(x)}
 
 #' alias for deparse(substitute())
@@ -133,13 +139,14 @@ if(0){
 
 
 #' first Free Fig Number
-#' e firstFreeFigN()
+#e firstFreeFigN()
 firstFreeFigN= function(dirr='../img', patt='^Fig_(\\d+).*\\.png$') nin(1:999, suppressWarnings(nu(gsub(patt, '\\1', dir(dirr, patt='.png$')))))[1]
 firstFreeFigN= function(dirr='../img', patt='^(Fig|Pic)_(\\d+).*\\.png$') nin(1:999, suppressWarnings(nu(gsub(patt, '\\2', dir(dirr, patt='.png$')))))[1]
 
 
-#' wrapper for dev.print  -  save graphics to .png file
+#w  dev.print  -  save graphics to .png and .pdf files, print paceholder for <img> in RWJournal
 #p  gg   = is.ggplot
+#p  off  dev.off() after save
 sg= saveGraphics= function(capt=.main, Width = dev.size(units = "px")[1] , off= T
 		, Height =  dev.size(units = "px")[2], GraphPointSize = 12, dirr='../img', type= "cairo"
 		, res=96, dev=0, fNameWithCapt=F, gg=F, ...){ # type= "windows"
@@ -256,9 +263,11 @@ get.theFile= function() {
 
 
 
-	
+#' similar to knitr::spin	
 #' side effect: creates .rmd and .kn.htm  files
-	code2rmd= function(.file= get.theFile(), s= readLines(.file, warn= F), toTempDir=T, show=T) { catf('\ncode2rmd("%s"): \n', .file)  #, withLineNum=T
+#en rmd= code2rmd()
+#en rmd= code2rmd(toTempDir =F)
+code2rmd= function(.file= get.theFile(), s= readLines(.file, warn= F), toTempDir=T, show=T) { catf('\ncode2rmd("%s"): \n', .file)  #, withLineNum=T
 		stopifnot(require(knitr))
 		stopifnot(require(markdown))
 		
@@ -275,15 +284,27 @@ get.theFile= function() {
 		
 		ss= dtt(i= 1:le(s), q1, q2, ich, iich, is.code, s, s2=s)  #, q2a, q2b
 		
+		### ident
+		ss[, s:= gsub('\t','    ', s), by=i][, s2:=s]
+		ss[q1, ident:= nchar(sub('(\\s*).*', '\\1', s)), by=i]
+		if(dropIdent<-1) ss[is.code==0, s:= substr(s, ident[1]+1, 999), by=iich]
+		if(dropIdent<-1) ss[is.code==0, ident.ch:= ident[1], by=iich]
+		if(dropIdent<-1) ss[is.na(ident.ch), ident.ch:= -1]
+		if(dropIdent<-1) ss[, s2:= s]
+		aa<<- ss
+#		which(aa>0)
+#		attr(aa,"match.length")[156]
+#	aa[155:160,]
+		
 		dout= if(toTempDir) tempdir() else dirname(.file)
 		fout= fp(dout, basename(.file))
 		
 		#' s2 - code for .rwd
 		if(1){
-			ss[(q1 | q2) & ich%%2==0,  s2:=  sf("%s\n\n```{r %s}", s, i)]
-			ss[(q1 | q2) & ich%%2==1,  s2:=  sf("```\n%s",  s)]
-			ss[i==1      & ich%%2==0,  s2:=  sf("\n```{r 1}\n%s", s)]
-			ss[i==le(s)  & ich%%2==0,  s2:=  sf("%s\n```",  s)]
+			ss[(q1 | q2) & ich%%2==0 & ident.ch<990,  s2:=  sf("%s\n\n```{r %s}", s, i)]
+			ss[(q1 | q2) & ich%%2==1 & ident.ch<990,  s2:=  sf("```\n%s",  s)]
+			ss[i==1      & ich%%2==0 & ident.ch<990,  s2:=  sf("\n```{r 1}\n%s", s)]
+			ss[i==le(s)  & ich%%2==0 & ident.ch<990,  s2:=  sf("%s\n```",  s)]
 			ss[,  s2:=  gsub('(^|[^x"])@', '\\1\\\\', gsub('@@', '\\\\\\\\', s2))]  # escapes for LaTeX @ -> \
 			#wl(ss$s2, .file %+% '.rmd')
 		}
@@ -352,10 +373,8 @@ get.theFile= function() {
 		invisible(list(file= .file, dout= dout, fout= fout, rmd=rmd, lines=ss, out.rmd= fout %+% '.rmd'
 						, out.kn.htm= fout %+% '.kn.htm', out.kn.nu.htm= fout %+% '.kn.nu.htm'))
 	}
-#e rmd= code2rmd()
-#e rmd= code2rmd(toTempDir =F)
 	
-#e treat.knit.html(theFile)  dout=dirname(theFile), rFile=theFile
+#en treat.knit.html(theFile)  dout=dirname(theFile), rFile=theFile
 	kn.htm2rwj= treat.knit.html= function(theFile, rFile=theFile, dout=dirname(rFile)) { catf('\n:\n')
 		'we have 2 knitr produced files: code2rmd() ->  .kn.htm  and cccc= rmd2htm.main -> .html'
 
@@ -416,7 +435,7 @@ get.theFile= function() {
 				
 				$(".aToggleComments").click(function() {ToggleComments2();})
 				
-				// $(".aD").click(function() //zzz does not work inside <code> can be explicitly call <a href="javascript:alert();" class="aD">
+				// $(".aD").click(function() //zzz does not work inside <code>...</code>, can be explicitly call <a href="javascript:alert();" class="aD">
 				
 				})
 				</script>
@@ -494,7 +513,7 @@ cl("e.src= " + e.src);
 				//body {max-width: 95%; font-size: 100%; line-height: 100%;}
 				div.Gallery {background-color:rgb(255,248,248); }	
 				div.TOC {background-color:rgb(248,248,255); }	
-				div.main, .r {font-family: monospace; white-space: pre; max-width: 1000px}
+				div.r {font-family: monospace; white-space: pre; max-width: 1000px}
 				//p{margin-bottom:2%; margin-top:2%;margin-before: 2%; margin-after: 2%;}
 				code {border: 0px}
 				pre  {border: 1px solid}
@@ -502,11 +521,14 @@ cl("e.src= " + e.src);
 				.D1, .D2, .D3, .D4, .D5  {background-color:rgba(255,240,240, .2); border-style:ridge; margin:5px; padding:15px;-moz-border-radius:5px; border-radius:5px} /*div {; opacity: 0.3; background-color:GhostWhite; border-left-style:ridge;}  */
 				// code, pre  {background-color:rgba(240,240,255, .2); border-style:ridge; margin:5px; padding:15px;-moz-border-radius:5px; border-radius:5px} 
 				div.D5 {font-size:8px;} 
+				div.D-fold {display:block; margin-top: -1.5em; padding:0px;} // margin-bottom:0em;
+
 				//.sq {font-size:12px; font-family: Arial; color:DodgerBlue } 
 				center, .capt {font-size:12px; font-weight:bold; font-family: Arial; margin:auto; text-align:center;}
 				.captTOC {font-size:100%; font-weight:bold; font-family: Arial; align:left}
 				H1,  H2,  H3,  H4,  H5 {color:blue; font-family: Arial; color:teal;}
 				.H1, .H2, .H3, .H4, .H5 {color:teal; font-family: Arial; font-weight:bold;  display:inline-block; display:-moz-inline-box;}
+				.md {display:block;}
 				H1, .H1 {font-size:300%;  margin-top:36px;  margin-bottom:8px;  margin-left:0px; } 
 				H2, .H2 {font-size:250%;  margin-top:28px;  margin-bottom:5px;  margin-left:20px;} 
 				.TOC.H1, H3, .H3 {font-size:200%;  margin-top:15px;  margin-bottom:3px;  margin-left:40px;}
@@ -540,7 +562,7 @@ cl("e.src= " + e.src);
 		footer=	'<div id= "show" style= "position: absolute; left:-1000px; top:1px; border:solid blue; padding:5; display:none; background-color:white; -moz-border-radius: 10px; border-radius: 10px;">
 				<span id="showTxt"></span><br/>
 				<img id="showFig" src="#" height="401" style="left:0px" alt=""/>
-				</div>\n</body>\n</html>'
+				</div id= "show">\n</body>\n</html>'
 		
 		sk3= readLines(theFile %+% '.kn.nu.htm')  # by  cccc(wchunks=T) 
 		sk.tit= grep('<title>', sk3)
@@ -584,7 +606,8 @@ cl("e.src= " + e.src);
 		#wl(s, '1c.htm')
 		
 		s= gsub('^(.+/span>.*?)( *#=+ *)(.*)$','\\1<span class="comment2">\\2</span>\\3', s)  
-		
+		#s= gsub('^(.+/span>.*?)( *#[=#]+ *)(.*)$','\\1<span class="comment2">\\2</span>\\3', s)  
+
 		#wl(s, '2.htm')
 		
 		s= gsub('^(.+/span>.*)(#\\-\\-)(.*)$','\\1<span class="comment2">\\2</span>\\3', s)  
@@ -631,10 +654,10 @@ cl("e.src= " + e.src);
 		#' treat headers
 		#p patt.le - regex, it's length -2 is defines header level
 		#'  s= gsub('(<span id="sp(\\d+)".*\\s*#== )(.*)( =+.*)$',  '\\1<span class="H2" id="\\2" title="\\2">\\3</span> <span class="comment2">\\4</span>',  s)
-		get.r.headers= function(s, find='(<span id="sp(\\d+)".*\\s*#=+ )(.*)( =+.*)$', patt.le='#=+ '
+		get.r.headers= function(s, find='(<span id="sp(\\d+)".*\\s*#=+ )(.*)( =+.*)$', pattNeg="'|&#39;", patt.le='#=+ '
 				, replace='\\1<span class="H%s" id="\\2" title="\\2">\\3</span> <span class="comment2">\\4</span>') { 
 			h= regexpr(find, s)
-			i= which(h>0)
+			i= which(h>0 & !grepl(pattNeg, s))
 			hh= dtt(i, le=attr(regexpr(patt.le, s[i]),"match.length"), s=s[i])
 			hh[, s2:=sub(find, sf(replace, ch(le-2)), s), by=i]
 			hh
@@ -657,8 +680,9 @@ cl("e.src= " + e.src);
 		#brr()
 		prr(s[hh1$i])
 		
-		hh= get.r.headers(s, find='(<span id="sp(\\d+)".*\\s*##+ )(.*?)( =+.*)?$', patt.le='##+ '
-				, replace='\\1<span class="H%s" id="\\2" title="\\2">\\3</span> <span class="comment2">\\4</span>')
+		#hh= get.r.headers(s, find='(<span id="sp(\\d+)".*\\s*##+ )(.*?)( =+.*)?$', patt.le='##+ '
+		hh= get.r.headers(s, find='(<span id="sp(\\d+)"[^\']*\\s*##+ )(.*?)( =+.*)?$', patt.le='##+ '
+		, replace='\\1<span class="H%s" id="\\2" title="\\2">\\3</span> <span class="comment2">\\4</span>')
 		s[hh$i]= hh$s2
 		#wl(s, theFile %+% '.3.kn.htm')
 		
@@ -673,36 +697,38 @@ cl("e.src= " + e.src);
 		imgFold= '<img src="" alt="-" class="fold" />'
 		
 		
-		if (`split fold divs`<- 0) {
+		if (`split <pre> fold divs`<- 0) {
 			s1= ifelse(depth!= 0, gsub('^(<span id=.sp(\\d+)[^#]*\\{[^\\{\\}]*)'
-							, '\\1 <a href="javascript:ToggleFold(\\2)" id="asp\\2"><img src="" alt="-" class="fold" /></a>
-									</code></pre><div class="D-fold" id="D\\2"><pre><code class="r div">', s1), s1)
+							, '\\1 <a href="javascript:ToggleFold(\\2)" id="asp\\2"><img src="" alt="-" class="fold" /></a></code></pre><div class="D-fold" id="D\\2" ><pre><code class="r div">', s1), s1)
 			
 			s1= gsub('^(.* class="H(\\d)".* id="(\\d+).*)D-fold(.*) class="D-fold"' , '\\1D\\3\\4 class="D\\2" id="D\\3"', s1)
-			s1= ifelse(depth!= 0, gsub('([^#\\{\\}]*)\\}', '\\1<b>}</b></code></pre></div><pre><code class="r fold">', s1), s1)
+			s1= ifelse(depth!= 0, gsub('([^#\\{\\}]*)\\}', '\\1<b>}</b></code></pre></div class="D-fold" ><pre><code class="r fold">', s1), s1)
 			
 		}else{
-			s1= ifelse(depth!= 0, gsub('^(<span id=.sp(\\d+)[^#]*\\{[^\\{\\}]*)'
-							, '\\1 <a href="javascript:ToggleFold(\\2)" id="asp\\2"><img src="" alt="-" class="fold" /></a>
-									<div class="D-fold" id="D\\2">', s1), s1)
+#			s1= ifelse(depth!= 0, gsub('^(<span id=.sp(\\d+)[^#]*\\{[^\\{\\}]*)'
+#							, '\\1 <a href="javascript:ToggleFold(\\2)" id="asp\\2"><img src="" alt="-" class="fold" /></a><div class="D-fold" id="D\\2">', s1), s1)
+#			
+#			s1= gsub('^(.* class="H(\\d)".* id="(\\d+).*)D-fold(.*) class="D-fold"' , '\\1D\\3\\4 class="D\\2" id="D\\3"', s1)
+#			s1= ifelse(depth!= 0, gsub('([^#\\{\\}]*)\\}', '\\1<b>}</b></div class="D-fold">', s1), s1)
+			s1= ifelse(depth!= 0, gsub('^(<span id=.sp(\\d+)[^#]*\\{[^\\{\\}]*)$'
+							, '\\1 <a href="javascript:ToggleFold(\\2)" id="asp\\2"><img src="" alt="-" class="fold" /></a><div class="D-fold" id="D\\2">', s1), s1)
 			
 			s1= gsub('^(.* class="H(\\d)".* id="(\\d+).*)D-fold(.*) class="D-fold"' , '\\1D\\3\\4 class="D\\2" id="D\\3"', s1)
-			s1= ifelse(depth!= 0, gsub('([^#\\{\\}]*)\\}', '\\1<b>}</b></div>', s1), s1)
-			
+			s1= ifelse(depth!= 0, gsub('^([^#\\{\\}]*)\\}', '\\1<b>}</b></div class="D-fold">', s1), s1)
 		}
 		
 		
 		
 		#==  prepare Gallery  ==
 		#figs= gre2('# (Pic|Fig)_\\d+',, s1) # prr(figs)
-#figs= gre2('class="fig"',, s1) # prr(figs)
-#figs= sub('.*(<img id=".*?>).*','\\1', figs) # prr(gal)
-
-figs= gre2('class="j?fig"',, s1) ; prr(figs)
-figs= sub('.*(<img id=".*?>).*','\\1', figs) ; prr(figs)
-figs= sub('.*(<iframe id=".*?iframe>).*','\\1', figs) # prr(gal)
-
-figs= sub('class="jfig"','class="imgGal"', sub('width="100%"  height="600px"', 'width=300 height=140 style="-ms-zoom: 0.25"', figs))
+		#figs= gre2('class="fig"',, s1) # prr(figs)
+		#figs= sub('.*(<img id=".*?>).*','\\1', figs) # prr(gal)
+		
+		figs= gre2('class="j?fig"',, s1) ; prr(figs)
+		figs= sub('.*(<img id=".*?>).*','\\1', figs) ; prr(figs)
+		figs= sub('.*(<iframe id=".*?iframe>).*','\\1', figs) # prr(gal)
+		
+		figs= sub('class="jfig"','class="imgGal"', sub('width="100%"  height="600px"', 'width=300 height=140 style="-ms-zoom: 0.25"', figs))
 
 
 		figs= sub('img id="', 'img id="tn', figs) # prr(gal)
@@ -715,7 +741,7 @@ figs= sub('class="jfig"','class="imgGal"', sub('width="100%"  height="600px"', '
 		
 		#' numerate md <h> -> <span class="H
 		s1= ifelse(grepl('<h\\d+', s1), sf('<!-- l#%s -->%s', 1:le(s1), s1), s1)
-		s1= sub('<!-- l#(\\d+) -->.*<h(\\d)>(.*)</h.>', '<span class="H\\2" id="md\\1">\\3</span>', s1)
+		s1= sub('<!-- l#(\\d+) -->.*<h(\\d)>(.*)</h.>', '<span class="H\\2 md" id="md\\1">\\3</span>', s1)
 		
 		toc= grep('img id=|iframe id=|<H\\d+|<h\\d+|"H[1-5]', s1, value=TRUE) 
 		toc= gsub('.*(<span class="H.*?)=* *</span>.*', '<br/>\\1</span>', toc)  # clean <H>
@@ -750,10 +776,10 @@ figs= sub('class="jfig"','class="imgGal"', sub('width="100%"  height="600px"', '
 				</style> <!-- ================================================================== -->'	
 		
 		main=s1;  #toc=''; 
-		out= c(sk.3[1:bd[1]], css, css2, menu.line, '<div class="Gallery"> <H3>Gallery for  ', rFile, ' </H3>'
-				, figs, '\n\n<hr/></div> <div class="TOContents" id="0"> <H2>Table of Contents</H2>', toc, '<hr/></div><br/>
+		out= c(sk.3[1:bd[1]], css2, menu.line, '<div class="Gallery"> <H3>Gallery for  ', rFile, ' </H3>'
+				, figs, '\n\n<hr/></div class="Gallery"> <div class="TOContents" id="0"> <H2>Table of Contents</H2>', toc, '<hr/></div class="TOContents"><br/>
 						<!-- pre --><div class="main">', main
-				, '</div><!-- /pre --><br>##   The HTML output of ', rFile, ' was created on '
+				, '</div class="main"><!-- /pre --><br>##   The HTML output of ', rFile, ' was created on '
 				, DT(),  '; <a href="http://www.mathjax.org/demos/scaling-math/">test MathJax </a>'
 				, js1, js.toggle
 				, footer)

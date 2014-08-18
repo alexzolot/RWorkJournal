@@ -15,83 +15,125 @@
 
 #' @import plyr HaLaP data.table knitr markdown base64
 #' @docType package
+NULL
 
-#' Created  : 2014-06-18 02:55:55
+#stopifnot(require(plyr)      )
+#stopifnot(require(knitr)     )
+#stopifnot(require(markdown)  )
+#stopifnot(require(base64)    )
+#stopifnot(require(data.table))
+##libra(data.table); 
+require(plyr)      
+require(knitr)     
+require(markdown)  
+require(base64)    
+require(data.table)
 
-stopifnot(require(plyr))
-stopifnot(require(knitr))
-stopifnot(require(markdown))
-stopifnot(require(base64))
-#libra(data.table); 
-stopifnot(require(data.table))
 dtt= data.table; ad= as.IDate; taa= tables  # vignette("datatable-faq")
 options(datatable.print.nrows=100)
 
 
-### from HaLaP
+###  from HaLaP
 '%+%' = paste0
 ch= as.character
 na= names
 sf= sprintf
 le= length
 fp= file.path
+#' @title expl
+#' @aliases expl 
 expl= function(x= gw(), ...) browseURL(x, ...)
 
 #'  catt with names
-#e  z= 1:5; v= letters[1:2];  catn(z, v, 7, u<-'a', v=88)
+#' @examples 
+#'   z= 1:5; v= letters[1:2];  catn(z, v, 7, u<-'a', v=88)
+#' @title catn
+#' @aliases catn 
 catn= function(...) {  # catt('catn:')
-  nargs= unlist(strsplit(ch(match.call()),'(),', fixed =T))[-1]  # names of args
+  nargs= unlist(strsplit(ch(match.call()), '(), ', fixed =TRUE))[-1]  # names of args
   for (i in 1:le(nargs)) catt(nargs[[i]],  '= ', list(...)[[i]])
 }
 
-#w cat + '\\n'
-#e catt(cars[,1])
+#' wrapper for cat + '\\n'
+#' @examples 
+#'  catt(cars[, 1])
+#' @title catt
+#' @aliases catt 
 catt= function(...) {cat(...); cat('\n'); invisible(flush.console())} 
 
 #' fun to split column names
-#e  cn('aa bb 2013')
-cn= function(cnn,  sep='[ ,\n\t\\+]+') unlist(strsplit(cnn, sep))  # b='',`%a%` = '%c%' =  col.names= cn(cnn)  'aa b 1'  %a% 1  aa b 1'  cn('aa b 1')
-#w cat + sprintf
+#' @examples 
+#'   cn('aa bb 2013')
+#' @title cn
+#' @aliases cn 
+cn= function(cnn,  sep='[ , \n\t\\+]+') unlist(strsplit(cnn, sep))  # b='', `%a%` = '%c%' =  col.names= cn(cnn)  'aa b 1'  %a% 1  aa b 1'  cn('aa b 1')
+#' wrapper for cat + sprintf
+#' @title catf
+#' @aliases catf 
 catf= function(...) cat(sprintf(...))
-#w grep
-gre2= function(patt='', pattNeg='^$', x, v=T, ...){ a=grepl(patt, x,...) & !grepl(pattNeg, x,...); return( if(v) x[a] else a) }
+#' wrapper for grep
+#' @title gre2
+#' @aliases gre2 
+gre2= function(patt='', pattNeg='^$', x, v=TRUE, ...){ a=grepl(patt, x, ...) & !grepl(pattNeg, x, ...); return( if(v) x[a] else a) }
 
-#w str
-#'e strr(cars)
+#' wrapper for str
+#' @examples 
+#'  strr(cars)
+#' @title strr
+#' @aliases strr 
 strr= function(x) {catf('\nstr(%s):\n', desu(x)); str(x)}
 
 #' alias for deparse(substitute())
+#' @title desu
+#' @aliases desu 
 desu= function(x, n=1) deparse(substitute(x, env= parent.frame(n) ))
 
 #' print list in 1 column
-#e prr(letters[1:5])
-#e prr(cars); prr(dir()); prr(character(0));
-prr= function(x, ma='', header=T) {if(header)catf('\n&&& %s == %s ==\n', ma, deparse(substitute(x))); ns= na(x)
+#' @examples 
+#'  prr(letters[1:5])
+#' @examples 
+#'  prr(cars); prr(dir()); prr(character(0));
+#' @title prr
+#' @aliases prr 
+prr= function(x, ma='', header=TRUE) {if(header)catf('\n&&& %s == %s ==\n', ma, deparse(substitute(x))); ns= na(x)
                                    if(le(x)==0){message('length=0'); return(0)}
                                    for(i in if(is.null(ns)) 1:le(x) else ns) catf('%3s= %s\n', i,  x[[i]]); catt('-------------------------\n')
 } 
 
-#w dir.create + setwd
-#en sw('myTestDir/mySubdir');  sw('../..'); expl()
+#' wrapper for dir.create + setwd
+#' @examples 
+#'  \dontrun{
+#'  sw('myTestDir/mySubdir');  sw('../..'); expl()
+#' }
+#' @title sw
+#' @aliases sw 
 sw= function (sDir, ...) {
-  dir.create(sDir, rec=T, ...)
+  dir.create(sDir, rec=TRUE, ...)
   setwd(sDir)
   catf('sw: Work dir set to: %s;  gw()\n', gw())
 }
 
-#w getwd
-#e gw()
+#' wrapper for getwd
+#' @examples 
+#'  gw()
+#' @title gw
+#' @aliases gw 
 gw= function(){catf('gw: sw("%s");  expl()\n', gw<- getwd()); invisible(gw)} 
 
 
-#'w writeLines
-wl= function(s=.Last.value, out, show=T, ...) { message(sf('\n\nwl to file: expl("file://%s")\n', out))
+#' wrapper for writeLines
+#' @title wl
+#' @aliases wl 
+wl= function(s=.Last.value, out, show=TRUE, ...) { message(sf('\n\nwl to file: expl("file://%s")\n', out))
 	writeLines(s, out, ...)
 	if(show) expl(sf("file://%s", normalizePath(out)))
 }
 
 #' date &  time 
-#e DT()
+#' @examples 
+#'  DT()
+#' @title DT= DateTime
+#' @aliases DT DateTime 
 DT= DateTime= function(format = "%Y-%m-%d %H:%M:%S") strftime(Sys.time(), format) 
 
 	onWin= nchar(Sys.getenv('computername')) > 0
@@ -101,12 +143,18 @@ DT= DateTime= function(format = "%Y-%m-%d %H:%M:%S") strftime(Sys.time(), format
 	#' x \ y
 	#r  x  which are not in  y
 	#e  nin(1:6, 4:9);  1:6 %-% 4:9
+#' @title 	nin= '%-%' 
+#' @aliases 	nin '%-%'  
 	nin= '%-%' = function(x, y) x[!(x %in% y)] # x not in y :   1:5 %-%  4:9 # `%-%` 
 	
 	
 
-countDepth2= function(s= c('{{b}', 'n s{}', 'n s'), ch1='{', ch2='}', woComments=T){
-  countChar1= function(s= c('{ {b}', 'n s{}', 'n s'), ch1='{') nchar(gsub(sf('[^%s]',ch1), '', s))
+#' @title countDepth2
+#' @aliases countDepth2 
+countDepth2= function(s= c('{{b}', 'n s{}', 'n s'), ch1='{', ch2='}', woComments=TRUE){
+#' @title   countChar1
+#' @aliases   countChar1 
+  countChar1= function(s= c('{ {b}', 'n s{}', 'n s'), ch1='{') nchar(gsub(sf('[^%s]', ch1), '', s))
   
   if(woComments) s= gsub('#.*', '', s)
   
@@ -133,40 +181,46 @@ if(0){
 
 
 #' first Free Fig Number
-#' e firstFreeFigN()
+#' @examples 
+#'  firstFreeFigN()
+#' @title firstFreeFigN
+#' @aliases firstFreeFigN 
 firstFreeFigN= function(dirr='../img', patt='^Fig_(\\d+).*\\.png$') nin(1:999, suppressWarnings(nu(gsub(patt, '\\1', dir(dirr, patt='.png$')))))[1]
+#' @title firstFreeFigN
+#' @aliases firstFreeFigN 
 firstFreeFigN= function(dirr='../img', patt='^(Fig|Pic)_(\\d+).*\\.png$') nin(1:999, suppressWarnings(nu(gsub(patt, '\\2', dir(dirr, patt='.png$')))))[1]
 
 
-#' wrapper for dev.print  -  save graphics to .png file
-#p  gg   = is.ggplot
-sg= saveGraphics= function(capt=.main, Width = dev.size(units = "px")[1] , off= T
+#' wrapper for  dev.print  -  save graphics to .png file
+#' @param  gg   = is.ggplot
+#' @param  off  dev.off() after save
+#' @title sg= saveGraphics
+#' @aliases sg saveGraphics 
+sg= saveGraphics= function(capt=.main, Width = dev.size(units = "px")[1] , off= TRUE
 		, Height =  dev.size(units = "px")[2], GraphPointSize = 12, dirr='../img', type= "cairo"
-		, res=96, dev=0, fNameWithCapt=F, gg=F, ...){ # type= "windows"
+		, res=96, dev=0, fNameWithCapt=FALSE, gg=FALSE, ...){ # type= "windows"
 	op= options(); on.exit(options(op))  #; options(error=dummy)
 	if(!file.exists(dirr)) dir.create(dirr)
-	#.iFig= 1 + max(0, nu(gsub('^(Pic|Fig)_(\\d+).*\\.png$', '\\2', dir(dirr, patt='.png$'))), na.rm=T)
 	.iFig= firstFreeFigN(dirr)
-	# catt('--------------------------------------- HHp: old iFig=', .iFig)
 	GraphFileName=  if(fNameWithCapt) sf('Fig_%s. %s', .iFig, capt) else  sf('Fig_%s', .iFig)
 	
 	AbsGraphFileName= sf('%s/%s/%s.png', gw(), dirr, GraphFileName)
-	catt('HHp: printing to ', AbsGraphFileName)
+	catt('saveGraphics: saving to ', AbsGraphFileName)
 	
 	#if(capt > '') title(capt, col.main='blue4')
 	
 	if(dev>0) dev.set(dev)
-	if(gg){try({  	ggsave(AbsGraphFileName)}, s=F)
+	if(gg){try({  	ggsave(AbsGraphFileName)}, s=FALSE)
 	} else { 
 		dev.copy2pdf(file = sub('png$', 'pdf', AbsGraphFileName)) #, width= 21, height = 10, pointsize= GraphPointSize)
 		dev.print(device = png, file = AbsGraphFileName, 
-				width= Width, height = Height, pointsize= GraphPointSize, units="px", type= type,...)
+				width= Width, height = Height, pointsize= GraphPointSize, units="px", type= type, ...)
 	}
 	
 	if(exists('.HTML.file'))	cat(sf('<p align="left"><img src="img/%s.png"  border="0" width="%s" height="%s"/><br/>
 								<span class="caption>%s</span><br/></p>/n', GraphFileName, Width, Height, capt)
 				, file = .HTML.file, append = TRUE)
-	# dir(fp(.HTML.file,'../../img'))
+	# dir(fp(.HTML.file, '../../img'))
 	
 	if(off) dev.off()
 	
@@ -177,13 +231,19 @@ sg= saveGraphics= function(capt=.main, Width = dev.size(units = "px")[1] , off= 
 }
 
 #' add title to the last graph, then save it.
+#' @title sgg
+#' @aliases sgg 
 sgg= function(capt='', ...) {title(capt); sg(capt, ...)}
 
 
 #'  save rCharts graphics to jFig_dd.htm file
-#en sgj(p1)
-sgj= function(p= p1, capt='', dirr='../img', absPath=T, fNameWithCapt=F) {
-	#.ijFig<<- max(0, nu(gsub('^jFig_(\\d+).*\\.htm$','\\1', dir(dirr, patt='.htm$'))), na.rm=T)
+#' @examples 
+#'  \dontrun{
+#'  sgj(p1)
+#' }
+#' @title sgj
+#' @aliases sgj 
+sgj= function(p= p1, capt='', dirr='../img', absPath=TRUE, fNameWithCapt=FALSE) {
 	.ijFig<<- firstFreeFigN(dirr='../img', patt='^jFig_(\\d+).*\\.htm$')
 	GraphFileName=  if(fNameWithCapt) sf('jFig_%s. %s', .ijFig, capt) else  sf('jFig_%s', .ijFig)
 	AbsGraphFileName= if(absPath) sf('%s/%s.htm', dirr, GraphFileName)  else sf('%s/%s/%s.htm', gw(), dirr, GraphFileName)
@@ -198,8 +258,13 @@ sgj= function(p= p1, capt='', dirr='../img', absPath=T, fNameWithCapt=F) {
 
 
 #'  save d3 graphics to jFig_dd.htm file
-#en sgj(p1)
-sgd3= function(capt='', dirr='../img', absPath=T, fNameWithCapt=F, fin='.htm', save=T) {s=.Last.value
+#' @examples 
+#'  \dontrun{
+#'  sgj(p1)
+#' }
+#' @title sgd3
+#' @aliases sgd3 
+sgd3= function(capt='', dirr='../img', absPath=TRUE, fNameWithCapt=FALSE, fin='.htm', save=TRUE) {s=.Last.value
 	.ijFig<<- firstFreeFigN(dirr='../img', patt='^jFig_(\\d+).*\\.htm$')
 	GraphFileName=  if(fNameWithCapt) sf('jFig_%s. %s', .ijFig, capt) else  sf('jFig_%s', .ijFig)
 	AbsGraphFileName= if(absPath) sf('%s/%s.htm', dirr, GraphFileName)  else sf('%s/%s/%s.htm', gw(), dirr, GraphFileName)
@@ -215,9 +280,9 @@ sgd3= function(capt='', dirr='../img', absPath=T, fNameWithCapt=F, fin='.htm', s
 if (0) {
 	libra(d3Network)
 	
-	d3SimpleNetwork(df(source=sample(1:9, 9, re=T),  target=sample(1:9, 9, re=T), fontsize = 15
+	d3SimpleNetwork(df(source=sample(1:9, 9, re=TRUE),  target=sample(1:9, 9, re=TRUE), fontsize = 15
 				, linkColour = '#FF0000'
-				, nodeColour = sample(cn('#0000FF #FF0000 #00FF00'), 9, re=T)), file='.htm')
+				, nodeColour = sample(cn('#0000FF #FF0000 #00FF00'), 9, re=TRUE)), file='.htm')
 	expl('.htm')
 	sgd3()
 	# jFig_1.
@@ -226,6 +291,8 @@ if (0) {
 
 
 #' Clean spare Figs
+#' @title CleanSpareFigs
+#' @aliases CleanSpareFigs 
 CleanSpareFigs= function() { #==  Clean spare Figs  ==
 	ff=dir('.', 'png')
 	#~  [1] "Pic_1.png"      "Pic_10.png"     "Pic_11 (2).png" "Pic_11.png"     "Pic_12 (2).png" "Pic_12.png"     "Pic_13 (2).png" "Pic_13.png"     "Pic_14 (2).png" "Pic_14.png"     "Pic_15.png"     "Pic_16.png"     "Pic_17.png"     "Pic_18.png"     "Pic_19.png"     "Pic_20.png"     "Pic_21.png"     "Pic_22.png"     "Pic_23.png"     "Pic_24.png"     "Pic_25.png"     "Pic_26.png"     "Pic_27.png"     "Pic_28.png"     "Pic_29.png"     "Pic_3.png"      "Pic_31.png"     "Pic_32.png"     "Pic_33.png"     "Pic_34.png"     "Pic_35.png"     "Pic_36.png"     "Pic_37.png"     "Pic_38.png"     "Pic_39.png"     "Pic_4.png"      "Pic_40.png"     "Pic_41.png"     "Pic_43.png"     "Pic_44.png"     "Pic_45.png"     "Pic_46.png"     "Pic_47.png"     "Pic_48.png"     "Pic_49.png"     "Pic_50.png"     "Pic_51.png"     "Pic_52.png"     "Pic_53.png"     "Pic_54.png"     "Pic_55.png"     "Pic_6.png"      "Pic_7.png"      "Pic_8.png"      "Pic_9.png"     
@@ -245,7 +312,12 @@ CleanSpareFigs= function() { #==  Clean spare Figs  ==
 
 
 #'  get global variable or option "theFile"
-#en get.theFile() 
+#' @examples 
+#'  \dontrun{
+#'  get.theFile() 
+#' }
+#' @title get.theFile
+#' @aliases get.theFile 
 get.theFile= function() {
 	tf= if(exists('theFile', envir= .GlobalEnv)) {get('theFile', envir= .GlobalEnv)
 			} else getOption('theFile')
@@ -256,15 +328,28 @@ get.theFile= function() {
 
 
 
-	
+#' similar to knitr::spin	
 #' side effect: creates .rmd and .kn.htm  files
-	code2rmd= function(.file= get.theFile(), s= readLines(.file, warn= F), toTempDir=T, show=T) { catf('\ncode2rmd("%s"): \n', .file)  #, withLineNum=T
+#' @examples 
+#'  \dontrun{
+#'  rmd= code2rmd()
+#' }
+#' @examples 
+#'  \dontrun{
+#'  rmd= code2rmd(toTempDir =FALSE)
+#' }
+#' @title code2rmd
+#' @aliases code2rmd 
+code2rmd= function(.file= get.theFile(), s= readLines(.file, warn= FALSE), toTempDir=TRUE, show=TRUE) { catf('\ncode2rmd("%s"): \n', .file)  #, withLineNum=TRUE
 		stopifnot(require(knitr))
 		stopifnot(require(markdown))
 		
 		sing.quo= regexpr('^\\s*([\'"`])\\s*$', s)
-		q1= gre2('^\\s*[\'"`]', '^\\s*([\'"`]).*\\1', s, v=F)  # line start quote
-		q2= gre2('[\'"`]\\s*$', "(['\"`]).*\\1\\s*$|#'\\s*$", s, v=F)  # line end quote, not roxygen
+		q1= gre2('^\\s*[\'"`]', '^\\s*([\'"`]).*\\1', s, v=FALSE)  # line start quote
+		#q2= gre2('[\'"`]\\s*$', "(['\"`]).*\\1\\s*$|#'\\s*$", s, v=FALSE)  # line end quote, not roxygen
+		#q2= gre2('[\'"`]\\s*$', "\\1.*(['\"`])\\s*$|#'\\s*$", s, v=FALSE)  # line end quote, not roxygen
+		#q2= gre2('[\'"`]\\s*$', "(.*['\"`]){2, }\\s*$", s, v=FALSE)  # line end quote, not roxygen
+		q2= gre2('[^#][\'"`]\\s*$', "(#.*|'.*'|\".*\"|`.*`)\\s*$", s, v=FALSE)  # line end quote, not roxygen
 		
 		ich= cumsum(q2 | q1)  # chunk index
 		iich= ich - ifelse(ich%%2, 0, c(0, diff(ich)))  # chunk index, from 0; 0 is.code
@@ -272,25 +357,40 @@ get.theFile= function() {
 		
 		ss= dtt(i= 1:le(s), q1, q2, ich, iich, is.code, s, s2=s)  #, q2a, q2b
 		
+		### ident
+		ss[, s:= gsub('\t', '    ', s), by=i][, s2:=s]
+		ss[q1, ident:= nchar(sub('(\\s*).*', '\\1', s)), by=i]
+		if(dropIdent<-1) ss[is.code==0, s:= substr(s, ident[1]+1, 999), by=iich]
+		if(dropIdent<-1) ss[is.code==0, ident.ch:= ident[1], by=iich]
+		if(dropIdent<-1) ss[is.na(ident.ch), ident.ch:= -1]
+		if(dropIdent<-1) ss[, s2:= s]
+		aa<<- ss
+#		which(aa>0)
+#		attr(aa, "match.length")[156]
+#	aa[155:160, ]
+		
 		dout= if(toTempDir) tempdir() else dirname(.file)
 		fout= fp(dout, basename(.file))
 		
 		#' s2 - code for .rwd
 		if(1){
-			ss[(q1 | q2) & ich%%2==0,  s2:=  sf("%s\n\n```{r %s}", s, i)]
-			ss[(q1 | q2) & ich%%2==1,  s2:=  sf("```\n%s",  s)]
-			ss[i==1      & ich%%2==0,  s2:=  sf("\n```{r 1}\n%s", s)]
-			ss[i==le(s)  & ich%%2==0,  s2:=  sf("%s\n```",  s)]
+			ss[(q1 | q2) & ich%%2==0 & ident.ch<990,  s2:=  sf("%s\n\n```{r %s}", s, i)]
+			ss[(q1 | q2) & ich%%2==1 & ident.ch<990,  s2:=  sf("```\n%s",  s)]
+			ss[i==1      & ich%%2==0 & ident.ch<990,  s2:=  sf("\n```{r 1}\n%s", s)]
+			ss[i==le(s)  & ich%%2==0 & ident.ch<990,  s2:=  sf("%s\n```",  s)]
 			ss[,  s2:=  gsub('(^|[^x"])@', '\\1\\\\', gsub('@@', '\\\\\\\\', s2))]  # escapes for LaTeX @ -> \
 			#wl(ss$s2, .file %+% '.rmd')
 		}
+		options(datatable.print.nrows=600)
+		print(ss)
+		a.<<- ss   #xxx
 		
 		rmd= ss$s2
 		
 		#if(toTempDir) {dout=tempdir();   .file= fp(dout, basename(theFile))} else dout= dirname(theFile)
 		
 		
-		wl(rmd,  fout %+% '.rmd', F)
+		wl(rmd,  fout %+% '.rmd', FALSE)
 		
 		#' s3 - code for .rwd with line numbers comments in r chunks 
 		# insert comments with line numbers in non-empty R chunks
@@ -305,11 +405,11 @@ get.theFile= function() {
 			ss[is.code==1 ,  s3:= sub('(.*#)( j?Fig.*)', "\\1\n\n```\n#####\\2\n\n```{r }", s3)]  
 			
 			rmd= ss$s3
-			wl(rmd,  fout %+% '.rmd', T)			
+			wl(rmd,  fout %+% '.rmd', TRUE)			
 		}
 		
 		
-		opts_chunk$set(eval=F)
+		opts_chunk$set(eval=FALSE)
 		kn= knit(, text= rmd) 
 		#			markdownToHTML(file, output, text,
 		#					options = getOption("markdown.HTML.options"),
@@ -321,8 +421,8 @@ get.theFile= function() {
 		#			expl(getOption("markdown.HTML.header"))
 		#			expl(getOption("markdown.HTML.template"))
 		
-		#knit.htm= markdownToHTML(fout %+% outSuffix, text= kn, fragment.only=F, out=fout %+% '.kn.htm')
-		knit.htm= markdownToHTML(fout %+% '.rmd', text= kn, fragment.only=F, out=fout %+% '.kn.htm'
+		#knit.htm= markdownToHTML(fout %+% outSuffix, text= kn, fragment.only=FALSE, out=fout %+% '.kn.htm')
+		knit.htm= markdownToHTML(fout %+% '.rmd', text= kn, fragment.only=FALSE, out=fout %+% '.kn.htm'
 				, options = cn('mathjax highlight_code toc'))  #, extensions= cn('no_intra_emphasis latex_math')  'base64_images'
 		expl(fout %+% '.kn.htm')
 		
@@ -333,9 +433,9 @@ get.theFile= function() {
 			s3= ifelse(grepl('(^\\s*$|```|^\\s*\\\\|\\\\\\[|\\\\\\]|= *\\\\)', ss$s2), ss$s2, sf('%s #zz#%s#', ss$s2, 1:le(ss$s2)))
 			s3= ss$s3	# prr(ss$s3)
 			rmd.nu= c(s3)  #; strr(rmd.nu); prr(rmd.nu)
-			wl(rmd.nu,  fout %+% '.nu.rmd', F)
+			wl(rmd.nu,  fout %+% '.nu.rmd', FALSE)
 			kn.nu= knit(, text= rmd.nu) 
-			kn.nu.htm= markdownToHTML(fout %+% '.nu.rmd', text= kn.nu, fragment.only=F, out=fout %+% '.kn.nu.htm'
+			kn.nu.htm= markdownToHTML(fout %+% '.nu.rmd', text= kn.nu, fragment.only=FALSE, out=fout %+% '.kn.nu.htm'
 					, options = cn('mathjax highlight_code'))  #, extensions= cn('no_intra_emphasis latex_math')
 			expl(fout %+% '.kn.nu.htm')
 		}
@@ -346,10 +446,13 @@ get.theFile= function() {
 		invisible(list(file= .file, dout= dout, fout= fout, rmd=rmd, lines=ss, out.rmd= fout %+% '.rmd'
 						, out.kn.htm= fout %+% '.kn.htm', out.kn.nu.htm= fout %+% '.kn.nu.htm'))
 	}
-#e rmd= code2rmd()
-#e rmd= code2rmd(toTempDir =F)
 	
-#e treat.knit.html(theFile)  dout=dirname(theFile), rFile=theFile
+#' @examples 
+#'  \dontrun{
+#'  treat.knit.html(theFile)  dout=dirname(theFile), rFile=theFile
+#' }
+#' @title 	kn.htm2rwj= treat.knit.html
+#' @aliases 	kn.htm2rwj treat.knit.html 
 	kn.htm2rwj= treat.knit.html= function(theFile, rFile=theFile, dout=dirname(rFile)) { catf('\n:\n')
 		'we have 2 knitr produced files: code2rmd() ->  .kn.htm  and cccc= rmd2htm.main -> .html'
 
@@ -360,8 +463,8 @@ get.theFile= function() {
 				<script>
 				
 				var d= document;  
-				var imgFold= "<img src=\'data:image/jpeg;base64,R0lGODlhDQAMAJEAAAAAAP///2NlY////yH5BAEAAAMALAAAAAANAAwAAAIYnI+pK+2OBIvzSHWNfJtin2SDaEUctCwFADs=\' alt=\'-\'/>";
-				var srcMinus="data:image/jpeg;base64,R0lGODlhDQAMAJEAAAAAAP///2NlY////yH5BAEAAAMALAAAAAANAAwAAAIYnI+pK+2OBIvzSHWNfJtin2SDaEUctCwFADs=";
+				var imgFold= "<img src=\'data:image/jpeg;base64, R0lGODlhDQAMAJEAAAAAAP///2NlY////yH5BAEAAAMALAAAAAANAAwAAAIYnI+pK+2OBIvzSHWNfJtin2SDaEUctCwFADs=\' alt=\'-\'/>";
+				var srcMinus="data:image/jpeg;base64, R0lGODlhDQAMAJEAAAAAAP///2NlY////yH5BAEAAAMALAAAAAANAAwAAAIYnI+pK+2OBIvzSHWNfJtin2SDaEUctCwFADs=";
 				
 				$(document).ready(function(){
 				
@@ -385,11 +488,11 @@ get.theFile= function() {
 				$("img.imgGal, img.TOCfig")
 				.mouseover(function() {this.title= this.alt; show(this) })
 				.mouseout(function() { show(0) })
-				.click(function() {gotoo(this.id.replace("tn","").replace("TOC","")) })
+				.click(function() {gotoo(this.id.replace("tn", "").replace("TOC", "")) })
 				.dblclick(function(e) { e.preventDefault(); ShowImg(this.src, this.alt, e.ctrlKey) });
 				
 				
-				$("span.TOC").click(function() {gotoo(this.id.replace("TOC","")) })
+				$("span.TOC").click(function() {gotoo(this.id.replace("TOC", "")) })
 				
 				
 				$(".aToggle.DD1").click(function() {toggleD($(this), $(".H1 + + .aD"), $(".D1")) })
@@ -398,7 +501,7 @@ get.theFile= function() {
 				$(".aToggle.DD4").click(function() {toggleD($(this), $(".H4 + + .aD"), $(".D4")) })
 				$(".aToggle.TOContents").click(function() {toggleD($(this), $(".zz"), $("div.TOContents")) })
 				$(".aToggle.Gallery").click(function() {toggleD($(this), $(".zz"), $("div.Gallery")) })
-				$(".aToggleAllFig").click(function()   {toggleD($(this), $(".zz"), $("img,iframe"))}) //xxx: ; toggleD($(this), $(".zz"), $("iframe")) 
+				$(".aToggleAllFig").click(function()   {toggleD($(this), $(".zz"), $("img, iframe"))}) //xxx: ; toggleD($(this), $(".zz"), $("iframe")) 
 				//$(".linu").click(function() { $("body").scrollTop(0) })
 				
 				$("#aToggleAll").click(function() {th= $(this)
@@ -410,7 +513,7 @@ get.theFile= function() {
 				
 				$(".aToggleComments").click(function() {ToggleComments2();})
 				
-				// $(".aD").click(function() //zzz does not work inside <code> can be explicitly call <a href="javascript:alert();" class="aD">
+				// $(".aD").click(function() //zzz does not work inside <code>...</code>, can be explicitly call <a href="javascript:alert();" class="aD">
 				
 				})
 				</script>
@@ -439,7 +542,7 @@ get.theFile= function() {
 				
 				function ShowImg(src, capt, ctrl){ 
 				if(ctrl) {src= src.replace("png", "pdf")};
-				w= window.open(src, capt, "type=fullWindow,fullscreen,location=\'\',height="+ screen.height+ ",width="+screen.width)
+				w= window.open(src, capt, "type=fullWindow, fullscreen, location=\'\', height="+ screen.height+ ", width="+screen.width)
 				if(ctrl) { w.document.location= src} else {w.document.write("<html><title>" +  capt + "</title>" + capt + "<br/><img src=\'"  + src + "\' /> </html>")};
 				w.title= capt;
 				w.document.title= capt;
@@ -485,27 +588,32 @@ cl("e.src= " + e.src);
 				</script>
 				'
 		css='	<style scoped>  /*  www.w3schools.com/cssref/css_colornames.asp  www.tizag.com/cssT/border.php */
-				body {max-width: 95%; font-size: 100%; line-height: 105%;}
-				div.Gallery {background-color:rgb(255,248,248); }	
-				div.TOC {background-color:rgb(248,248,255); }	
-				div.main, .r {font-family: monospace; white-space: pre; max-width: 1000px}
-				p{margin-bottom:2%; margin-top:2%;margin-before: 2%; margin-after: 2%;}
+				//body {max-width: 95%; font-size: 100%; line-height: 100%;}
+				div.Gallery {background-color:rgb(255, 248, 248); }	
+				div.TOC {background-color:rgb(248, 248, 255); }	
+				//div.main, .r {font-family: monospace; white-space: pre; max-width: 1000px}
+				div.r {font-family: monospace; white-space: pre; max-width: 1000px}
+				//p{margin-bottom:2%; margin-top:2%;margin-before: 2%; margin-after: 2%;}
 				code {border: 0px}
 				pre  {border: 1px solid}
 				
-				.D1, .D2, .D3, .D4, .D5  {background-color:rgba(255,240,240, .2); border-style:ridge; margin:5px; padding:15px;-moz-border-radius:5px; border-radius:5px} /*div {; opacity: 0.3; background-color:GhostWhite; border-left-style:ridge;}  */
-				// code, pre  {background-color:rgba(240,240,255, .2); border-style:ridge; margin:5px; padding:15px;-moz-border-radius:5px; border-radius:5px} 
+				.D1, .D2, .D3, .D4, .D5  {background-color:rgba(255, 240, 240, .2); border-style:ridge; margin:5px; padding:15px;-moz-border-radius:5px; border-radius:5px} /*div {; opacity: 0.3; background-color:GhostWhite; border-left-style:ridge;}  */
+				// code, pre  {background-color:rgba(240, 240, 255, .2); border-style:ridge; margin:5px; padding:15px;-moz-border-radius:5px; border-radius:5px} 
 				div.D5 {font-size:8px;} 
+				div.D-fold {display:block; margin-top: -1.5em; padding:0px;} // margin-bottom:0em;
+
 				//.sq {font-size:12px; font-family: Arial; color:DodgerBlue } 
 				center, .capt {font-size:12px; font-weight:bold; font-family: Arial; margin:auto; text-align:center;}
 				.captTOC {font-size:100%; font-weight:bold; font-family: Arial; align:left}
 				H1,  H2,  H3,  H4,  H5 {color:blue; font-family: Arial; color:teal;}
 				.H1, .H2, .H3, .H4, .H5 {color:teal; font-family: Arial; font-weight:bold;  display:inline-block; display:-moz-inline-box;}
+				.md {display:block;}
 				H1, .H1 {font-size:300%;  margin-top:36px;  margin-bottom:8px;  margin-left:0px; } 
 				H2, .H2 {font-size:250%;  margin-top:28px;  margin-bottom:5px;  margin-left:20px;} 
 				.TOC.H1, H3, .H3 {font-size:200%;  margin-top:15px;  margin-bottom:3px;  margin-left:40px;}
 				.TOC.H2, H4, .H4 {font-size:150%;  margin-top:12px;  margin-bottom:2px;  margin-left:60px;}
 				.TOC.H3, H5, .H5 {font-size:120%;  margin-top:10px;  margin-bottom:1px;  margin-left:80px;}
+				.TOC.H4, H6, .H6 {font-size:105%;  margin-top:7px;  margin-bottom:1px;  margin-left:100px;}
 				img.fig, .captTOC, img.tnTOC {margin-top:0px;   margin-bottom:0px;  margin-left:10px;} 
 				.TOC.H1, .TOC.H2, .TOC.H3, .TOC.H4, .TOC.H5, span.captTOC, img.tnTOC { display:block;}
 				.D77 { display:inline; }
@@ -515,7 +623,7 @@ cl("e.src= " + e.src);
 				
 				.fun {color:indigo; font-weight:bold;}
 				.comment {color:green; align:left}
-				.comment2 {color: rgb(100,200,100); font-size:3px; -webkit-text-size-adjust: none;}
+				.comment2 {color: rgb(100, 200, 100); font-size:3px; -webkit-text-size-adjust: none;}
 				.text, .sq {color: teal; font-size:12px;}
 				</style>
 				' 
@@ -533,9 +641,9 @@ cl("e.src= " + e.src);
 		footer=	'<div id= "show" style= "position: absolute; left:-1000px; top:1px; border:solid blue; padding:5; display:none; background-color:white; -moz-border-radius: 10px; border-radius: 10px;">
 				<span id="showTxt"></span><br/>
 				<img id="showFig" src="#" height="401" style="left:0px" alt=""/>
-				</div>\n</body>\n</html>'
+				</div id= "show">\n</body>\n</html>'
 		
-		sk3= readLines(theFile %+% '.kn.nu.htm')  # by  cccc(wchunks=T) 
+		sk3= readLines(theFile %+% '.kn.nu.htm')  # by  cccc(wchunks=TRUE) 
 		sk.tit= grep('<title>', sk3)
 		sk3[sk.tit]= sf('<title>%s - RWJ</title>', basename(theFile))
 		
@@ -562,26 +670,27 @@ cl("e.src= " + e.src);
 		#wl(s, '1.htm')
 		
 		#'  comments, TODO and xxx  ==
-#	s= gsub("^(\\s*#\')(.*)$",'<span class="comment2">\\1</span><span class="text">\\2</span>', s)  
-#	s= gsub('(#[^\'=-].*?)(<|$)','<span class="comment">\\1</span>\\2', s) 
-#	s= gsub('^(.*)(#=+)(.*)$','\\1<span class="comment2">\\2</span>\\3', s)  
-#	s= gsub('^(.*)(#\\-\\-)(.*)$','\\1<span class="comment2">\\2</span>\\3', s)   
-#	s= gsub('^(.*# ?.*)((xxx|TODO):.*)(</span.*)$','\\1<font color="red">\\2</font>\\4', s)
+#	s= gsub("^(\\s*#\')(.*)$", '<span class="comment2">\\1</span><span class="text">\\2</span>', s)  
+#	s= gsub('(#[^\'=-].*?)(<|$)', '<span class="comment">\\1</span>\\2', s) 
+#	s= gsub('^(.*)(#=+)(.*)$', '\\1<span class="comment2">\\2</span>\\3', s)  
+#	s= gsub('^(.*)(#\\-\\-)(.*)$', '\\1<span class="comment2">\\2</span>\\3', s)   
+#	s= gsub('^(.*# ?.*)((xxx|TODO):.*)(</span.*)$', '\\1<font color="red">\\2</font>\\4', s)
 		
 		
 		#'  comments, TODO and xxx  ==
-		s= gsub("^(.+/span>\\s*#\')(.*)$",'<span class="comment2">\\1</span><span class="text">\\2</span>', s)  
+		s= gsub("^(.+/span>\\s*#\')(.*)$", '<span class="comment2">\\1</span><span class="text">\\2</span>', s)  
 		#wl(s, '1b.htm')
 		
-		s= gsub('( #[^\'=-].*?)(<|$)','<span class="comment">\\1</span>\\2', s)  
+		s= gsub('( #[^\'=-].*?)(<|$)', '<span class="comment">\\1</span>\\2', s)  
 		#wl(s, '1c.htm')
 		
-		s= gsub('^(.+/span>.*?)( *#=+ *)(.*)$','\\1<span class="comment2">\\2</span>\\3', s)  
-		
+		s= gsub('^(.+/span>.*?)( *#=+ *)(.*)$', '\\1<span class="comment2">\\2</span>\\3', s)  
+		#s= gsub('^(.+/span>.*?)( *#[=#]+ *)(.*)$', '\\1<span class="comment2">\\2</span>\\3', s)  
+
 		#wl(s, '2.htm')
 		
-		s= gsub('^(.+/span>.*)(#\\-\\-)(.*)$','\\1<span class="comment2">\\2</span>\\3', s)  
-		s= gsub('^(.+/span>.*# ?.*)((xxx|TODO):.*)(</span.*)$','\\1<font color="red">\\2</font>\\4', s)
+		s= gsub('^(.+/span>.*)(#\\-\\-)(.*)$', '\\1<span class="comment2">\\2</span>\\3', s)  
+		s= gsub('^(.+/span>.*# ?.*)((xxx|TODO):.*)(</span.*)$', '\\1<font color="red">\\2</font>\\4', s)
 		
 		
 		#' treat figs
@@ -589,44 +698,48 @@ cl("e.src= " + e.src);
 		#			, '<br/></code><code class="r"><img id="\\2" class="fig" src="img/\\2.png" width=700 alt="\\2\\3"/>   
 		#					<br/><span class="capt">\\1\\2\\3</span><br/>', s)
 #		strr(s)
-#		u= gre2('# Fig_\\d+',,s)
+#		u= gre2('# Fig_\\d+', ,s)
 #		prr(u)
-##		u= gre2('^(.*id="sp(\\d+)".*# )(Fig_\\d+)(.*?)(</span.*)',,s)
+##		u= gre2('^(.*id="sp(\\d+)".*# )(Fig_\\d+)(.*?)(</span.*)', ,s)
 ##		prr(u)
-#		u= gre2('^(.*id="sp(\\d+)".*# )(Fig_\\d+)',,s)
+#		u= gre2('^(.*id="sp(\\d+)".*# )(Fig_\\d+)', ,s)
 #		prr(u)
 		#stop('zzzzz')
 
 #		s= gsub('^(.*id="sp(\\d+)".*# )(Fig_\\d+)(.*?)(</span.*)'
 #				, '<br/></code><code class="r"><img id="fig\\2" class="fig" src="img/\\3.png" width=700 alt="\\3\\4"/>   
 #						<br/><span class="capt">\\3\\4</span><br/>', s)
-		s= gsub('^(.*id="sp(\\d+)".*# )(Fig_\\d+)(.*)'
-				, '<br/></code><code class="r"><img id="fig\\2" class="fig" src="img/\\3.png" width=700 alt="\\3\\4"/>   
+#s= gsub('^(.*id="sp(\\d+)".*# )(Fig_\\d+)(.*)'
+				s= gsub('^(.*id="sp(\\d+)".*# )(Fig_\\d+)([^<>]*)'
+								, '<br/></code><code class="r"><img id="fig\\2" class="fig" src="img/\\3.png"
+								 width=700 alt="\\3\\4"/>   
 						<br/><span class="capt">\\3\\4</span><br/>', s)
 		#' js figs (d3)
-		s= gsub('^(.*id="sp(\\d+)".*# )(jFig_\\d+)(.*)'
+		s= gsub('^(.*id="sp(\\d+)".*# )(jFig_\\d+)([^<>]*)'
 				, '<br/></code><code class="r"><iframe id="fig\\2" class="jfig" src="img/\\3.htm" width="100%"  height="600px" name="\\3\\4"></iframe>  
 						<br/><span class="capt">\\3\\4</span><br/>', s)
 		
 		#' treat Pics
-		s= gsub('^(.*id="sp(\\d+)".*# )(Pic_\\d+)(.*)'
+		s= gsub('^(.*id="sp(\\d+)".*# )(Pic_\\d+)([^<>]*)'
 				, '<br/></code><code class="r"><img id="fig\\2" class="fig" src="img/\\3.png" width=700 alt="\\3\\4"/>   
 						<br/><span class="capt">\\3\\4</span><br/>', s)
 		#' js figs (d3)
-		s= gsub('^(.*id="sp(\\d+)".*# )(jPic_\\d+)(.*)'
+		s= gsub('^(.*id="sp(\\d+)".*# )(jPic_\\d+)([^<>]*)'
 				, '<br/></code><code class="r"><iframe id="fig\\2" class="jfig" src="img/\\3.htm" width="100%"  height="600px" name="\\3\\4"></iframe>  
 						<br/><span class="capt">\\3\\4</span><br/>', s)
 
-#s1[i]= gsub('^([^\\~]*# *"?)(jFig_\\d+)(.*)','\n\n <iframe src="img/\\2.htm" width="100%" height="600px"></iframe>\n\n \\1\\2\\3' , s1[i])
+#s1[i]= gsub('^([^\\~]*# *"?)(jFig_\\d+)(.*)', '\n\n <iframe src="img/\\2.htm" width="100%" height="600px"></iframe>\n\n \\1\\2\\3' , s1[i])
 		
 		#' treat headers
 		#p patt.le - regex, it's length -2 is defines header level
 		#'  s= gsub('(<span id="sp(\\d+)".*\\s*#== )(.*)( =+.*)$',  '\\1<span class="H2" id="\\2" title="\\2">\\3</span> <span class="comment2">\\4</span>',  s)
-		get.r.headers= function(s, find='(<span id="sp(\\d+)".*\\s*#=+ )(.*)( =+.*)$', patt.le='#=+ '
+#' @title 		get.r.headers
+#' @aliases 		get.r.headers 
+		get.r.headers= function(s, find='(<span id="sp(\\d+)".*\\s*#=+ )(.*)( =+.*)$', pattNeg="'|&#39;", patt.le='#=+ '
 				, replace='\\1<span class="H%s" id="\\2" title="\\2">\\3</span> <span class="comment2">\\4</span>') { 
 			h= regexpr(find, s)
-			i= which(h>0)
-			hh= dtt(i, le=attr(regexpr(patt.le, s[i]),"match.length"), s=s[i])
+			i= which(h>0 & !grepl(pattNeg, s))
+			hh= dtt(i, le=attr(regexpr(patt.le, s[i]), "match.length"), s=s[i])
 			hh[, s2:=sub(find, sf(replace, ch(le-2)), s), by=i]
 			hh
 		}
@@ -648,8 +761,9 @@ cl("e.src= " + e.src);
 		#brr()
 		prr(s[hh1$i])
 		
-		hh= get.r.headers(s, find='(<span id="sp(\\d+)".*\\s*##+ )(.*)( =+.*)?$', patt.le='##+ '
-				, replace='\\1<span class="H%s" id="\\2" title="\\2">\\3</span> <span class="comment2">\\4</span>')
+		#hh= get.r.headers(s, find='(<span id="sp(\\d+)".*\\s*##+ )(.*?)( =+.*)?$', patt.le='##+ '
+		hh= get.r.headers(s, find='(<span id="sp(\\d+)"[^\']*\\s*##+ )(.*?)( =+.*)?$', patt.le='##+ '
+		, replace='\\1<span class="H%s" id="\\2" title="\\2">\\3</span> <span class="comment2">\\4</span>')
 		s[hh$i]= hh$s2
 		#wl(s, theFile %+% '.3.kn.htm')
 		
@@ -659,46 +773,65 @@ cl("e.src= " + e.src);
 		s1= s
 		depth= countDepth2(s1)
 		#imgFold= '<img src=\'https://ui.netbeans.org/docs/ui/code_folding/cf_minus.gif\' alt="-"/>'
-		# imgFold= '<img src="data:image/jpeg;base64,R0lGODlhDQAMAJEAAAAAAP///2NlY////yH5BAEAAAMALAAAAAANAAwAAAIYnI+pK+2OBIvzSHWNfJtin2SDaEUctCwFADs=" alt="-"/>';
+		# imgFold= '<img src="data:image/jpeg;base64, R0lGODlhDQAMAJEAAAAAAP///2NlY////yH5BAEAAAMALAAAAAANAAwAAAIYnI+pK+2OBIvzSHWNfJtin2SDaEUctCwFADs=" alt="-"/>';
 		
 		imgFold= '<img src="" alt="-" class="fold" />'
 		
-		s1= ifelse(depth!= 0, gsub('^(<span id=.sp(\\d+)[^#]*\\{[^\\{\\}]*)'
-						, '\\1 <a href="javascript:ToggleFold(\\2)" id="asp\\2"><img src="" alt="-" class="fold" /></a>
-								</code></pre><div class="D-fold" id="D\\2"><pre><code class="r div">', s1), s1)
 		
-		s1= gsub('^(.* class="H(\\d)".* id="(\\d+).*)D-fold(.*) class="D-fold"' , '\\1D\\3\\4 class="D\\2" id="D\\3"', s1)
-		s1= ifelse(depth!= 0, gsub('([^#\\{\\}]*)\\}', '\\1<b>}</b></code></pre></div><pre><code class="r fold">', s1), s1)
+		if (`split fold divs`<- 0) {
+			s1= ifelse(depth!= 0, gsub('^(<span id=.sp(\\d+)[^#]*\\{[^\\{\\}]*)'
+							, '\\1 <a href="javascript:ToggleFold(\\2)" id="asp\\2"><img src="" alt="-" class="fold" /></a>
+									</code></pre><div class="D-fold" id="D\\2"><pre><code class="r div">', s1), s1)
+			
+			s1= gsub('^(.* class="H(\\d)".* id="(\\d+).*)D-fold(.*) class="D-fold"' , '\\1D\\3\\4 class="D\\2" id="D\\3"', s1)
+			s1= ifelse(depth!= 0, gsub('([^#\\{\\}]*)\\}', '\\1<b>}</b></code></pre></div><pre><code class="r fold">', s1), s1)
+			
+		}else{
+#			s1= ifelse(depth!= 0, gsub('^(<span id=.sp(\\d+)[^#]*\\{[^\\{\\}]*)'
+#							, '\\1 <a href="javascript:ToggleFold(\\2)" id="asp\\2"><img src="" alt="-" class="fold" /></a><div class="D-fold" id="D\\2">', s1), s1)
+#			
+#			s1= gsub('^(.* class="H(\\d)".* id="(\\d+).*)D-fold(.*) class="D-fold"' , '\\1D\\3\\4 class="D\\2" id="D\\3"', s1)
+#			s1= ifelse(depth!= 0, gsub('([^#\\{\\}]*)\\}', '\\1<b>}</b></div class="D-fold">', s1), s1)
+			s1= ifelse(depth!= 0, gsub('^(<span id=.sp(\\d+)[^#]*\\{[^\\{\\}]*)$'
+							, '\\1 <a href="javascript:ToggleFold(\\2)" id="asp\\2"><img src="" alt="-" class="fold" /></a><div class="D-fold" id="D\\2">', s1), s1)
+			
+			s1= gsub('^(.* class="H(\\d)".* id="(\\d+).*)D-fold(.*) class="D-fold"' , '\\1D\\3\\4 class="D\\2" id="D\\3"', s1)
+			s1= ifelse(depth!= 0, gsub('^([^#\\{\\}]*)\\}', '\\1<b>}</b></div class="D-fold">', s1), s1)
+		}
+		
+		
 		
 		#==  prepare Gallery  ==
-		#figs= gre2('# (Pic|Fig)_\\d+',, s1) # prr(figs)
-#figs= gre2('class="fig"',, s1) # prr(figs)
-#figs= sub('.*(<img id=".*?>).*','\\1', figs) # prr(gal)
-
-figs= gre2('class="j?fig"',, s1) # prr(figs)
-figs= sub('.*(<img id=".*?>).*','\\1', figs) # prr(gal)
-figs= sub('.*(<iframe id=".*?iframe>).*','\\1', figs) # prr(gal)
-
-figs= sub('class="jfig"','class="imgGal"', sub('width="100%"  height="600px"', 'width=300 height=140 style="-ms-zoom: 0.25"', figs))
+		#figs= gre2('# (Pic|Fig)_\\d+', , s1) # prr(figs)
+		#figs= gre2('class="fig"', , s1) # prr(figs)
+		#figs= sub('.*(<img id=".*?>).*', '\\1', figs) # prr(gal)
+		
+		figs= gre2('class="j?fig"', , s1) ; prr(figs)
+		figs= sub('.*(<img id=".*?>).*', '\\1', figs) ; prr(figs)
+		figs= sub('.*(<iframe id=".*?iframe>).*', '\\1', figs) # prr(gal)
+		
+		figs= sub('class="jfig"', 'class="imgGal"', sub('width="100%"  height="600px"', 'width=300 height=140 style="-ms-zoom: 0.25"', figs))
 
 
 		figs= sub('img id="', 'img id="tn', figs) # prr(gal)
-		figs= sub('class="fig"','class="imgGal"', sub('width=700','height=140', figs))
+		figs= sub('class="fig"', 'class="imgGal"', sub('width=700', 'height=140', figs))
 		
-		#js0= sub(,'text/x-mathjax-config',, js)
+		#js0= sub(, 'text/x-mathjax-config', , js)
 		
 		
 		#==  prepare Table of Contents  ==	
 		
 		#' numerate md <h> -> <span class="H
 		s1= ifelse(grepl('<h\\d+', s1), sf('<!-- l#%s -->%s', 1:le(s1), s1), s1)
-		s1= sub('<!-- l#(\\d+) -->.*<h(\\d)>(.*)</h.>', '<span class="H\\2" id="md\\1">\\3</span>', s1)
+		s1= sub('<!-- l#(\\d+) -->.*<h(\\d)>(.*)</h.>', '<span class="H\\2 md" id="md\\1">\\3</span>', s1)
 		
 		toc= grep('img id=|iframe id=|<H\\d+|<h\\d+|"H[1-5]', s1, value=TRUE) 
 		toc= gsub('.*(<span class="H.*?)=* *</span>.*', '<br/>\\1</span>', toc)  # clean <H>
 		toc= sub('.*(<img id=".* alt="(.*?)").*', '\\1 title="\\2"/>', toc) # clean fig
 		toc= sub('.*(<iframe id=".*) name="(.*?)"(.*iframe>).*', '\\1 title="\\2"\\3', toc) # clean fig
-		toc= sub('width="100%"  height="600px"', 'width=300 height=140 style="-ms-zoom: 0.25"', toc) # clean fig
+		#toc= sub('width="100%"  height="600px"', 'width=300 height=140 style="-ms-zoom: 0.25"', toc) # clean fig
+		toc= sub('width=".*?"  height=".*?"', 'width=300 height=140 style="-ms-zoom: 0.25"', toc) # clean fig
+		toc= sub(' width=.*? ', ' height=140 ', toc) # clean fig
 		toc= sub(' id="', ' id="TOC', toc) # clean fig
 		
 		
@@ -725,17 +858,17 @@ figs= sub('class="jfig"','class="imgGal"', sub('width="100%"  height="600px"', '
 				</style> <!-- ================================================================== -->'	
 		
 		main=s1;  #toc=''; 
-		out= c(sk.3[1:bd[1]], css, css2, menu.line, '<div class="Gallery"> <H3>Gallery for  ', rFile, ' </H3>'
-				, figs, '\n\n<hr/></div> <div class="TOContents" id="0"> <H2>Table of Contents</H2>', toc, '<hr/></div><br/>
+		out= c(sk.3[1:bd[1]], css2, menu.line, '<div class="Gallery"> <H3>Gallery for  ', rFile, ' </H3>'
+				, figs, '\n\n<hr/></div class="Gallery"> <div class="TOContents" id="0"> <H2>Table of Contents</H2>', toc, '<hr/></div class="TOContents"><br/>
 						<!-- pre --><div class="main">', main
-				, '</div><!-- /pre --><br>##   The HTML output of ', rFile, ' was created on '
+				, '</div class="main"><!-- /pre --><br>##   The HTML output of ', rFile, ' was created on '
 				, DT(),  '; <a href="http://www.mathjax.org/demos/scaling-math/">test MathJax </a>'
 				, js1, js.toggle
 				, footer)
 		
-		wl(out, theFile %+% '.6.kn.htm', show=F)
+		wl(out, theFile %+% '.6.kn.htm', show=FALSE)
 		#if(dirname(theFile) != dout) 
-		file.copy(theFile %+% '.6.kn.htm', fp(dout, basename(rFile) %+% '.htm'), overwrite = T) 
+		file.copy(theFile %+% '.6.kn.htm', fp(dout, basename(rFile) %+% '.htm'), overwrite = TRUE) 
 		expl(fp(dout, basename(rFile) %+% '.htm'))
 		
 		invisible(list(s.htm= out, fout.htm= fp(dout, basename(rFile) %+% '.htm')))
@@ -744,22 +877,38 @@ figs= sub('class="jfig"','class="imgGal"', sub('width="100%"  height="600px"', '
 	
 #' R Work Journal
 #' .r -> .r.rwd + .r.nu.rwd  -(knit)->  .r.kn.htm + .r.kn.nu.htm  ->  .r.htm (or .r.html with base64 figs)
-#en r2rmd2rwj(theFile= 'M:/50_HLP/out/packages/WorkJournal/inst/rcode/test.WorkJournal.r')
-#en r2rmd2rwj(theFile= 'm:/50_HLP/out/HLP_demo/HLP_demo.r')
-#en r2rmd2rwj(theFile= 'm:/50_HLP/out/HLP_demo/demo_RWJ.r', base64=T)
-rwj= RWorkJournal= r2rmd2rwj= function(theFile= get.theFile(), base64=F, ...) { catf('\nr2rmd2rwj: %s\n', theFile)
+#' @examples 
+#'  \dontrun{
+#'  r2rmd2rwj(theFile= 'M:/50_HLP/out/packages/WorkJournal/inst/rcode/test.WorkJournal.r')
+#' }
+#' @examples 
+#'  \dontrun{
+#'  r2rmd2rwj(theFile= 'm:/50_HLP/out/HLP_demo/HLP_demo.r')
+#' }
+#' @examples 
+#'  \dontrun{
+#'  r2rmd2rwj(theFile= 'm:/50_HLP/out/HLP_demo/demo_RWJ.r', base64=TRUE)
+#' }
+#' @title rwj= RWorkJournal= r2rmd2rwj
+#' @aliases rwj RWorkJournal r2rmd2rwj 
+rwj= RWorkJournal= r2rmd2rwj= function(theFile= get.theFile(), base64=FALSE, ...) { catf('\nr2rmd2rwj: %s\n', theFile)
 	rmd= code2rmd(theFile, ...)
 	strr(rmd)
 	out= treat.knit.html(rmd$fout, rFile=theFile)
 	if(base64) rwjFig2base64(out$fout.htm)
 	#strr(out)
 }
-if(0) r2rmd2rwj(theFile= 'm:/50_HLP/out/HLP_demo/HLP_demo.r', base64=T)
-if(0) r2rmd2rwj(theFile= 'm:/50_HLP/out/HLP_demo/demo_RWJ.r', base64=T)
+if(0) r2rmd2rwj(theFile= 'm:/50_HLP/out/HLP_demo/HLP_demo.r', base64=TRUE)
+if(0) r2rmd2rwj(theFile= 'm:/50_HLP/out/HLP_demo/demo_RWJ.r', base64=TRUE)
 
 
 #' Insert base64 instead of src  ( rwj.htm +/img/) -> rwj.html - a singlefile
-#en rwjFig2base64(rwj= 'M:/50_HLP/out/HLP_demo/HLP_demo.r.htm')
+#' @examples 
+#'  \dontrun{
+#'  rwjFig2base64(rwj= 'M:/50_HLP/out/HLP_demo/HLP_demo.r.htm')
+#' }
+#' @title rwjFig2base64
+#' @aliases rwjFig2base64 
 rwjFig2base64= function(rwj= 'M:/50_HLP/out/HLP_demo/HLP_demo.r.htm') { catf('\nrwjFig2base64:%s\n', rwj)
 	#libra(base64)
 	s= readLines(rwj)
@@ -772,7 +921,7 @@ rwjFig2base64= function(rwj= 'M:/50_HLP/out/HLP_demo/HLP_demo.r.htm') { catf('\n
 	b64= laply(srcs, function(src){ catn('b64.src', src)
 				#u = encode(fp(gw(), '..', src),  out, 1e6)   #  	libra(base64)
 				u = encode(fp(dirname(rwj),  src),  out, 1e6)   #  	libra(base64)
-				u= 'data:image/jpeg;base64,' %+% readLines(out)
+				u= 'data:image/jpeg;base64, ' %+% readLines(out)
 			})
 	s2gb= laply(1:le(srcs), function(i) sub(' src="(.*?)"', sf(' src="%s"', b64[i]), s2[gal][i]))
 	
@@ -786,8 +935,8 @@ rwjFig2base64= function(rwj= 'M:/50_HLP/out/HLP_demo/HLP_demo.r.htm') { catf('\n
 			$("#TOC" + this.id)[0].src= this.src
 			})
 			})</script>'
-	#wl(append(s, js3, grep('</body>',s)[1]-1), fp(dout, "zz.htm"))  # insert before '</head>'
-	wl(append(s, js3, grep('</body>',s)[1]-1), rwj %+%  "l")  # insert before '</head>'
+	#wl(append(s, js3, grep('</body>', s)[1]-1), fp(dout, "zz.htm"))  # insert before '</head>'
+	wl(append(s, js3, grep('</body>', s)[1]-1), rwj %+%  "l")  # insert before '</head>'
 	expl(rwj %+%  "l")
 }
 
@@ -795,8 +944,10 @@ rwjFig2base64= function(rwj= 'M:/50_HLP/out/HLP_demo/HLP_demo.r.htm') { catf('\n
 
 
 
-#ReleaseOut= function(theFile= get.theFile(), vers='', exec=F) {
-  ReleaseOut= function(theFile, vers='', exec=F) {
+#ReleaseOut= function(theFile= get.theFile(), vers='', exec=FALSE) {
+#' @title   ReleaseOut
+#' @aliases   ReleaseOut 
+  ReleaseOut= function(theFile, vers='', exec=FALSE) {
     #stopifnot(basename(gw()) ==  "out" && dirname(gw()) == dirname(theFile))
     d= dirname(theFile)
     stopifnot(file.exists(theFile)  && file.exists(fp(d, 'out')) )
@@ -813,40 +964,53 @@ rwjFig2base64= function(rwj= 'M:/50_HLP/out/HLP_demo/HLP_demo.r.htm') { catf('\n
 		stopifnot(file.copy(theFile, outRelDir))
 		stopifnot(file.rename('../img', sf('%s/img', outRelDir)))
 		try(file.rename(sf('%s.htm', theFile), outFile), silent=TRUE)
-		sw('..', showWarnings=F)
+		sw('..', showWarnings=FALSE)
 		stopifnot(file.rename('out', gsub('\\.\\.', '.', outRelDir) %+% '/out'))
 		sw('out')
 	}
 }
-# ReleaseOut(theFile= 'M:/021_aaaa/021_aaaa.r', vers='.b', exec=T)
+# ReleaseOut(theFile= 'M:/021_aaaa/021_aaaa.r', vers='.b', exec=TRUE)
 
 
 
 #' =  make RWJournals =
 #' res<<-  is  produced as a side effect for case of error in cycle!!!
-#en RWJournals= MakeRWJournals(root='M:', patt='71_UseR-2013-Tutorial.*59.zz', pattNeg='zExtraPacks|999|scripts|library|lib|fun|Base|code2HTML|86_testShiny', exec=F, show=T, toSave=T, outSuffix='.b.htm')
-MakeRWJournals= function(root='.', patt='.*', pattNeg='^$', exec=F, ...) {
+#' @examples 
+#'  \dontrun{
+#'  RWJournals= MakeRWJournals(root='M:', patt='71_UseR-2013-Tutorial.*59.zz', pattNeg='zExtraPacks|999|scripts|library|lib|fun|Base|code2HTML|86_testShiny', exec=FALSE, show=TRUE, toSave=TRUE, outSuffix='.b.htm')
+#' }
+#' @title MakeRWJournals
+#' @aliases MakeRWJournals 
+MakeRWJournals= function(root='.', patt='.*', pattNeg='^$', exec=FALSE, ...) {
 	warning('List res<<-  and  .r.htm  files are produced as a side effect for case of error in cycle, if(exec) !!!')
 	.res= list(); attr(.res, "par")=list(...)
 	if(exec) res <<- .res
 	on.exit(invisible(.res))
-	for(f in  gre2(patt, pattNeg, dir(root, all.files =T, patt='\\.r$', recursive= T))) {
+	for(f in  gre2(patt, pattNeg, dir(root, all.files =TRUE, patt='\\.r$', recursive= TRUE))) {
 		catf('%3s. %s\n', le(.res), fp(root, f))
 		#if(exec) res[[f]] <<- .res[[f]] <- code2HTMLjQuery(.theFile=fp(root, f), ...)  else .res[[f]]= 1
 		if(exec) res[[f]] <<- .res[[f]] <- rwj(.theFile=fp(root, f), ...)  else .res[[f]]= 1
-		#try({if(exec) res[[f]] <<- .res[[f]] <- code2HTMLjQuery(.theFile=fp(root, f), ...)  else .res[[f]]= 1}, s=T)
+		#try({if(exec) res[[f]] <<- .res[[f]] <- code2HTMLjQuery(.theFile=fp(root, f), ...)  else .res[[f]]= 1}, s=TRUE)
 	}
 	invisible(.res)
 }
 
 
 #' create RWJ album  - galleries for all RWJ in a folder
-#p RWJournals - list of RWJ .html file names 
+#' @param RWJournals - list of RWJ .html file names 
 #' @usage 
 #' RWJournals= MakeRWJournals(...)
 #' createRWJalbum(RWJournals)
-#en createRWJalbum(RWJournals, fout='../all.Fig.35.htm')
-#en createRWJalbum(RWJournals.42b, fout='../RAlbum.42b.htm', outSuffix='.htm')
+#' @examples 
+#'  \dontrun{
+#'  createRWJalbum(RWJournals, fout='../all.Fig.35.htm')
+#' }
+#' @examples 
+#'  \dontrun{
+#'  createRWJalbum(RWJournals.42b, fout='../RAlbum.42b.htm', outSuffix='.htm')
+#' }
+#' @title createRWJalbum
+#' @aliases createRWJalbum 
 createRWJalbum= function(RWJournals, fout= '../all.Fig.htm', outSuffix= attr(RWJournals, "par")$outSuffix){  # outSuffix='.b.htm', outSuffix='.htm') {
 	out= c(RWJournals[[1]]$header
 			, sf('<script>
@@ -856,11 +1020,11 @@ createRWJalbum= function(RWJournals, fout= '../all.Fig.htm', outSuffix= attr(RWJ
 							$th.wrap("<a href=\'file:///" + href + "\' >")
 							});
 							$("img.imgGal").each( function() {
-							var $th = $(this), href =  this.alt +"%1$s#"  + this.id.replace("tn","");
+							var $th = $(this), href =  this.alt +"%1$s#"  + this.id.replace("tn", "");
 							$th.wrap("<a href=\'file:///" + href + "\' >")
 							});
 							$("h3").dblclick(function() {w= window.open(this.textContent.replace(/.* ([^ ]+) */, "$1")+ "%1$s", "", "fullscreen=yes");  w.focus() })
-							$("img.imgGal").dblclick(function() {w= window.open(this.alt +"%1$s#" + this.id.replace("tn",""), "","fullscreen=yes");  w.focus() })
+							$("img.imgGal").dblclick(function() {w= window.open(this.alt +"%1$s#" + this.id.replace("tn", ""), "", "fullscreen=yes");  w.focus() })
 							});
 							</script>', outSuffix)
 			, unlist(llply(RWJournals, function(x)c(' <H3>Gallery <SMALL> for  ', (x$theFile), '</SMALL></H3>'  #basename(x$theFile)
@@ -874,12 +1038,16 @@ createRWJalbum= function(RWJournals, fout= '../all.Fig.htm', outSuffix= attr(RWJ
 
 
 #' list RW Journals
+#' @title ls.RWJ
+#' @aliases ls.RWJ 
 ls.RWJ= function(patt='', pattNeg='^$', root='../../') { 
-	ff= dir2(sf('(%s).*.r.htm', patt), pattNeg, root, recursive=T); strr(ff); prr(ff)
+	ff= dir2(sf('(%s).*.r.htm', patt), pattNeg, root, recursive=TRUE); strr(ff); prr(ff)
 	fp(root, ff)
 }
 
 #' make RWJ.album gathering galeries from RWJs
+#' @title RWJ.album
+#' @aliases RWJ.album 
 RWJ.album= function(ff) { catf('\n:\n')
 	#out=''
 	js= '<script> $(function(){
@@ -888,11 +1056,11 @@ RWJ.album= function(ff) { catf('\n:\n')
 			$th.wrap("<a href=\'file:///" + href + "\' >")
 			});
 			$("img.imgGal").each( function() {
-			var $th = $(this), href =  this.alt +"#"  + this.id.replace("tn","");
+			var $th = $(this), href =  this.alt +"#"  + this.id.replace("tn", "");
 			$th.wrap("<a href=\'file:///" + href + "\' >")
 			});
 			$("h3").dblclick(function() {w= window.open(this.textContent.replace(/.* ([^ ]+) */, "$1"), "", "fullscreen=yes");  w.focus() })
-			$("img.imgGal").dblclick(function() {w= window.open(this.alt +"#" + this.id.replace("tn",""), "","fullscreen=yes");  w.focus() })
+			$("img.imgGal").dblclick(function() {w= window.open(this.alt +"#" + this.id.replace("tn", ""), "", "fullscreen=yes");  w.focus() })
 			});
 			</script>'
 	for(f in ff){catn(f)
@@ -934,9 +1102,11 @@ if (0) {
 ### Functions for CreateNewProj
 
 #' sub ... in file, used by CreateProj =
-fsub= function(fin="M:/83_ScopeR/AegisCustomDataSourceView.script"
+#' @title fsub
+#' @aliases fsub 
+fsub= function(fin= get.theFile()
 		, fout= gsub('$', '-copy$', fin)
-		, fileShow= F, overOut= T
+		, fileShow= FALSE, overOut= TRUE
 		, ...){
 	args <- as.list(substitute(list(...)))[-1L]
 	
@@ -944,22 +1114,22 @@ fsub= function(fin="M:/83_ScopeR/AegisCustomDataSourceView.script"
 	if(!overOut && file.exists(fout)){warning(sf('fout %s exists; Do nothing!', fout)); return()}
 	
 	fi= file(fin, "r")
-	s= readLines(fi, warn = F)
+	s= readLines(fi, warn = FALSE)
 	#
 	close(fi)
 	#	catt(11111)
 	#	catt(names(args))
 	#	str(args)
 	
-	for(key in names(args)){catt(key,'->', eval(args[[key]], envir= sys.parent())); s= gsub(key, eval(args[[key]], envir= sys.parent()), s)} 
+	for(key in names(args)){catt(key, '->', eval(args[[key]], envir= sys.parent())); s= gsub(key, eval(args[[key]], envir= sys.parent()), s)} 
 	
 	catt('fsub: Creating OutputFile:', fout)
-	#catf('::: s= gsub(\'\', \'\',  s)\n::: writeLines(he(s,9999), con =\'%s\')', fout)
+	#catf('::: s= gsub(\'\', \'\',  s)\n::: writeLines(he(s, 9999), con =\'%s\')', fout)
 	#print(s[80:100])
 	
 	#brr()
 	
-	if(fout != '') {writeLines(head(s,99999), con = fout)
+	if(fout != '') {writeLines(head(s, 99999), con = fout)
 		#if(fileShow)file.edit(fout)
 		if(fileShow)browseURL('file://' %+% fout)
 	}
@@ -968,16 +1138,19 @@ fsub= function(fin="M:/83_ScopeR/AegisCustomDataSourceView.script"
 
 #' sub of multiple patterns in multiple files
 #' res<<-  is  produced as a side effect for case of error in cycle!!!
-gsubInFiles= function(root='T:', patt='\\.r\\.htm', pattRepl='\\.r\\.htm', pattOutSub='\\.r\\.OO\\.htm', pattNeg='^$', exec=F, ...) {
+#' @title gsubInFiles
+#' @aliases gsubInFiles 
+gsubInFiles= function(root='TRUE:', patt='\\.r\\.htm', pattRepl='\\.r\\.htm'
+		, pattOutSub='\\.r\\.OO\\.htm', pattNeg='^$', exec=FALSE, ...) {
 	#warning('FilesSub produces a side effect if(exec) !!!')
-	ff= gre2(patt, pattNeg, dir(root, all.files =T, patt=patt, recursive= T))
+	ff= gre2(patt, pattNeg, dir(root, all.files =TRUE, patt=patt, recursive= TRUE))
 	prr(ff)
-	for(f in gre2(patt, pattNeg, dir(root, all.files =T, patt=patt, recursive= T))) {
-		fa=	tools:::file_path_as_absolute(f)
+	for(f in gre2(patt, pattNeg, dir(root, all.files =TRUE, patt=patt, recursive= TRUE))) {
+		fa=	tools:::file_path_as_absolute(fp(root, f))
 		faOut= gsub(pattRepl, pattOutSub, fa)
 		catt(fa, ' --> ', faOut)
 		if(exec){
-			fsub(fin= fa, fout= faOut, fileShow= T, ...)
+			fsub(fin= fa, fout= faOut, fileShow= TRUE, ...)
 			browseURL('file://' %+% fa)
 			browseURL('file://' %+% faOut)
 		} 
@@ -987,7 +1160,7 @@ gsubInFiles= function(root='T:', patt='\\.r\\.htm', pattRepl='\\.r\\.htm', pattO
 if (0) {
 	gsubInFiles(root='M:', patt='(95|97).*demo2.*\\.r\\.htm'
 			, pattRepl='\\.r\\.htm', pattOutSub='\\.r\\.htm'
-			, pattNeg='^$', exec=T, `alex.*zolot.us`= 'azolotovitski@medio.com')
+			, pattNeg='^$', exec=TRUE, `alex.*zolot.us`= 'azolotovitski@medio.com')
 	# m:/71_UseR-2013-Tutorial/out/97_tutorial-demo2.r.html
 	# m:/71_UseR-2013-Tutorial/out/97_tutorial-demo2.r.html  -->  m:/71_UseR-2013-Tutorial/out/97_tutorial-demo2.r.OO.html
 	browseURL('file://' %+% 'm:/71_UseR-2013-Tutorial/out/97_tutorial-demo2.r.html')
@@ -997,11 +1170,16 @@ if (0) {
 
 
 #'   Create New Project from template
-#en  CreateNewProj(newProj.name= '01_aaaa', root='m:'); sw('../..')
+#' @examples 
+#'  \dontrun{
+#'   CreateNewProj(newProj.name= '01_aaaa', root='m:'); sw('../..')
+#' }
+#' @title CreateProj= CreateProject= CreateNewProj
+#' @aliases CreateProj CreateProject CreateNewProj 
 CreateProj= CreateProject= CreateNewProj= function(newProj.name= 'newProjTemplName'
 		, Templ.dir= system.file('newProjTemplName', package ='WorkJournal')  
 		, root= gw()  # 'c:/'
-		, R2wd= F, overOut=F) {
+		, R2wd= FALSE, overOut=FALSE) {
 	sw(sf('%s/%s', root, newProj.name))
 	dir.create('in')
 	dir.create('out')
@@ -1011,13 +1189,13 @@ CreateProj= CreateProject= CreateNewProj= function(newProj.name= 'newProjTemplNa
 	
 	for(f in dir(Templ.dir,  patt='newProjTemplName.*|README.*')){
 		catt(60, f, sf('%s/%s/%s', root, newProj.name, sub('zz', newProj.name, f)))
-		#file.copy(fp(Templ.dir,f), gw())
+		#file.copy(fp(Templ.dir, f), gw())
 		catt('f=', f)
 		#if(grepl('zz', f)) fsub(fin= f
 		if(grepl('newProjTemplName|README', f) & !grepl('doc.?$', f)) {catt('fsub')
 			fsub(fin= fp(Templ.dir, f)
 					, fout= sub('newProjTemplName', newProj.name, f)
-					, fileShow= F, overOut=overOut
+					, fileShow= FALSE, overOut=overOut
 					, newProjTemplName= sf('%s', newProj.name)
 					, `00-00-00`= DT())
 			
@@ -1032,14 +1210,14 @@ CreateProj= CreateProject= CreateNewProj= function(newProj.name= 'newProjTemplNa
 					libra(R2wd)
 					wdGet(newProj.name %+% '.docx')
 					wdTitle(newProj.name)
-					wdWrite(sf('Author: Alex Zolot'), T)
-					wdWrite(sf('Created  : %s', DT()), T)
-					#wdSetFont(fontname="Courier New",fontsize=12,bold=F,italic=F)
+					wdWrite(sf('Author: Alex Zolot'), TRUE)
+					wdWrite(sf('Created  : %s', DT()), TRUE)
+					#wdSetFont(fontname="Courier New", fontsize=12, bold=FALSE, italic=FALSE)
 					
 					
 					wdNormal("Chapter 1")
 					wdHeading(2, 'Chapter 2')
-					wdWrite(sf('Chapter 3'), T)
+					wdWrite(sf('Chapter 3'), TRUE)
 					
 					wdSave(fpa(newProj.name %+% '.docx'))
 					wdQuit()
@@ -1053,8 +1231,8 @@ if(0) { #= Jun 23, 2013
 	# CreateNewProj(newProj.name= '71_UseR-2013-Tutorial', Templ.dir= 'R:/work/R-svn-ass/00_commonR/71_TestProjTemplate/zProjTempl', root='M:')
 	# CreateNewProj(newProj.name= '71_UseR-2013-Mod2Prod', Templ.dir= 'R:/work/R-svn-ass/00_commonR/71_TestProjTemplate/zProjTempl', root='M:')
 	# CreateNewProj(newProj.name= 'newProjTemplName', Templ.dir= 'R:/work/R-svn-ass/00_commonR/71_TestProjTemplate/zProjTempl', root='M:')
-	CreateNewProj(newProj.name= '97_tutorial-demo', Templ.dir= 'T:/work/UseR-2013/99_commonR/newProjTemplName', root='T:/work/UseR-2013')
-	CreateNewProj(newProj.name= '96_aaa', Templ.dir= 'T:/work/UseR-2013/99_commonR/newProjTemplName', root='T:/work/UseR-2013')
+	CreateNewProj(newProj.name= '97_tutorial-demo', Templ.dir= 'TRUE:/work/UseR-2013/99_commonR/newProjTemplName', root='TRUE:/work/UseR-2013')
+	CreateNewProj(newProj.name= '96_aaa', Templ.dir= 'TRUE:/work/UseR-2013/99_commonR/newProjTemplName', root='TRUE:/work/UseR-2013')
 	CreateNewProj(newProj.name= '98_aaa'); sw('../..')
 }
 
@@ -1063,7 +1241,7 @@ if(0) { #= Jun 23, 2013
 
 
 if(0){   #== Misc
-	theFile= 'R:/work/R-svn-ass/00_commonR/zCodeTools.fun.r'
+	theFile= 'R:/work/R-svn-ass/00_commonR/RWorkJournalTools.fun.r'
 	listFuncUsage(theFile, stoplist='^(c|if|for|function|with|within|exp|log|list|legend|lm|ifelse|invisible|ecdf|lines|plot|min|max|na\\.omit|f|expression|options|rgamma|runif|round|str|unique)$')
 	listFuncUsage(theFile, stoplist='^(c)$')
 	
@@ -1087,6 +1265,6 @@ if(0){   #== Misc
 	cc()
 	
 	shell('start explorer file:\\\\m:\\80_ChurnSim\\80_ChurnSim.r.jQ.htm')
-	CreateNewProj(newProj.name= 'HLP_demo', Templ.dir= 'T:/work/UseR-2013/lib/newProjTemplName', root='m:/50_HLP/out')
+	CreateNewProj(newProj.name= 'HLP_demo', Templ.dir= 'TRUE:/work/UseR-2013/lib/newProjTemplName', root='m:/50_HLP/out')
 } #--
 

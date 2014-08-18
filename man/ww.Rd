@@ -1,7 +1,7 @@
 \name{ww}
 \alias{ww}
 %- Also NEED an '\alias' for EACH other topic documented here.
-\title{
+\title{ Function ww..
 %%  ~~function to do ... ~~
 }
 \description{

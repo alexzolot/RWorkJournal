@@ -1,7 +1,7 @@
 \name{nu}
 \alias{nu}
 %- Also NEED an '\alias' for EACH other topic documented here.
-\title{
+\title{ Function nu..
 %%  ~~function to do ... ~~
 }
 \description{

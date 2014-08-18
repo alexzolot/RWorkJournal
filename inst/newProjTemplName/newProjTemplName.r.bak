@@ -1,7 +1,7 @@
 #! /usr/bin/Rscript 
 # Project  : newProjTemplName
 # File     : newProjTemplName/newProjTemplName.r
-# Author   : Alex Zolotoviski
+# Author   : Alex Zolotoviski, azolotovitski@medio.com
 # Created  : 00-00-00
 # License  : GPL-2
 ###############################################################################
@@ -9,11 +9,11 @@
 { #== init ===
 	rm(list=ls(envir = .GlobalEnv), envir = .GlobalEnv)
 	
-	options(help='html', digits=4, width=2160, scipen=5, editor='C:\\Program Files (x86)\\Notepad++\\notepad++.exe')
-	options(error= NULL)  # options(error= recover) options(error=dump) 
+	options(help='html', digits=4, width=2160, scipen=5, editor='C:\\Program Files (x86)\\Notepad++\\notepad++.exe'
+			, error= NULL) # options(error= recover) options(error=dump)  #or options(error=NULL)
 
 	onWin= Sys.getenv('R_PLATFORM')==''
-	if(onWin){root= 'm:'; 	memory.limit(size=24000)}  else root= '/home/zolotovi/work'   # memory.limit()
+	if(onWin){root= 'T:/work/UseR-2013'; 	memory.limit(size=9000)}  else root= '/home/azolotovitski/work'   # memory.limit()
 	
 	library(HaLaP)
 	library(WorkJournal)
@@ -30,12 +30,11 @@
 	
 	libra(plyr) 
 	libra(data.table)
-	libra(SOAR); srm= Store # Ls(); Attach(); Search(); loo(); vignette("SOAR") 
 	#libra(R2HTML) 
 	#libra(XLConnect)
 	
 	libra(RColorBrewer)  # display.brewer.all()
-	palette(c(adjustcolor(cn('grey50 blue3 red2'), alpha.f = .6), brewer.pal(8,"Dark2")))  # plot(1:19, pch=16, col=1:19, cex=3)
+	palette(c(adjustcolor(cn('grey50 green3 red2'), alpha.f = .6), brewer.pal(8,"Dark2")))  ##ex: plot(1:19, pch=16, col=1:19, cex=3)
 	
 	#libra(Defaults)
 	#	setDefaults(legend, bty='n')
@@ -71,21 +70,22 @@ if(0){#==  Data Inventory  ==
 	dir() # expl() 
 }
 
-if(0){#==  Data Exploration  ==
+{#==  Data Exploration  ==
 }
 
-if(0){#==  Predictive Modeling  ==
+{#==  Predictive Modeling  ==
 }
 
-if(0){#==  Reports  ==
+{#==  Reports  ==
 }
 
 
-if(0){#=== Misc
-	theFile= fp(proot, 'newProjTemplName.r')
+if(0){   #== Misc
 	theFile= 'm:/newProjTemplName/newProjTemplName.r'
 	gff('saved', theFile)
 	gff('sa\\(|===', theFile)
+	
+	theFile= fp(proot, 'newProjTemplName.r')
 	
 	CreateNewProj(newProj.name= '___zzz', Templ.dir= 'M:/50_HLP/out/packages/RWorkJournal/inst/newProjTemplName', root='m:')
 } #--

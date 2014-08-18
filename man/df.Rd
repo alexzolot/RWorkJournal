@@ -1,7 +1,7 @@
 \name{df}
 \alias{df}
 %- Also NEED an '\alias' for EACH other topic documented here.
-\title{
+\title{ Function df..
 %%  ~~function to do ... ~~
 }
 \description{

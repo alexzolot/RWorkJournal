@@ -15,8 +15,7 @@
 
 #' @import plyr HaLaP data.table knitr markdown base64
 #' @docType package
-
-#' Created  : 2014-06-18 02:55:55
+NULL
 
 #stopifnot(require(plyr)      )
 #stopifnot(require(knitr)     )
@@ -144,7 +143,7 @@ firstFreeFigN= function(dirr='../img', patt='^Fig_(\\d+).*\\.png$') nin(1:999, s
 firstFreeFigN= function(dirr='../img', patt='^(Fig|Pic)_(\\d+).*\\.png$') nin(1:999, suppressWarnings(nu(gsub(patt, '\\2', dir(dirr, patt='.png$')))))[1]
 
 
-#w  dev.print  -  save graphics to .png and .pdf files, print paceholder for <img> in RWJournal
+#w  dev.print  -  save graphics to .png file
 #p  gg   = is.ggplot
 #p  off  dev.off() after save
 sg= saveGraphics= function(capt=.main, Width = dev.size(units = "px")[1] , off= T
@@ -152,13 +151,11 @@ sg= saveGraphics= function(capt=.main, Width = dev.size(units = "px")[1] , off= 
 		, res=96, dev=0, fNameWithCapt=F, gg=F, ...){ # type= "windows"
 	op= options(); on.exit(options(op))  #; options(error=dummy)
 	if(!file.exists(dirr)) dir.create(dirr)
-	#.iFig= 1 + max(0, nu(gsub('^(Pic|Fig)_(\\d+).*\\.png$', '\\2', dir(dirr, patt='.png$'))), na.rm=T)
 	.iFig= firstFreeFigN(dirr)
-	# catt('--------------------------------------- HHp: old iFig=', .iFig)
 	GraphFileName=  if(fNameWithCapt) sf('Fig_%s. %s', .iFig, capt) else  sf('Fig_%s', .iFig)
 	
 	AbsGraphFileName= sf('%s/%s/%s.png', gw(), dirr, GraphFileName)
-	catt('HHp: printing to ', AbsGraphFileName)
+	catt('saveGraphics: saving to ', AbsGraphFileName)
 	
 	#if(capt > '') title(capt, col.main='blue4')
 	
@@ -190,7 +187,6 @@ sgg= function(capt='', ...) {title(capt); sg(capt, ...)}
 #'  save rCharts graphics to jFig_dd.htm file
 #en sgj(p1)
 sgj= function(p= p1, capt='', dirr='../img', absPath=T, fNameWithCapt=F) {
-	#.ijFig<<- max(0, nu(gsub('^jFig_(\\d+).*\\.htm$','\\1', dir(dirr, patt='.htm$'))), na.rm=T)
 	.ijFig<<- firstFreeFigN(dirr='../img', patt='^jFig_(\\d+).*\\.htm$')
 	GraphFileName=  if(fNameWithCapt) sf('jFig_%s. %s', .ijFig, capt) else  sf('jFig_%s', .ijFig)
 	AbsGraphFileName= if(absPath) sf('%s/%s.htm', dirr, GraphFileName)  else sf('%s/%s/%s.htm', gw(), dirr, GraphFileName)
@@ -276,7 +272,7 @@ code2rmd= function(.file= get.theFile(), s= readLines(.file, warn= F), toTempDir
 		#q2= gre2('[\'"`]\\s*$', "(['\"`]).*\\1\\s*$|#'\\s*$", s, v=F)  # line end quote, not roxygen
 		#q2= gre2('[\'"`]\\s*$', "\\1.*(['\"`])\\s*$|#'\\s*$", s, v=F)  # line end quote, not roxygen
 		#q2= gre2('[\'"`]\\s*$', "(.*['\"`]){2,}\\s*$", s, v=F)  # line end quote, not roxygen
-		q2= gre2('[^#][\'"`]\\s*$', "('.*'|\".*\"|`.*`)\\s*$", s, v=F)  # line end quote, not roxygen
+		q2= gre2('[^#][\'"`]\\s*$', "(#.*|'.*'|\".*\"|`.*`)\\s*$", s, v=F)  # line end quote, not roxygen
 		
 		ich= cumsum(q2 | q1)  # chunk index
 		iich= ich - ifelse(ich%%2, 0, c(0, diff(ich)))  # chunk index, from 0; 0 is.code
@@ -513,6 +509,7 @@ cl("e.src= " + e.src);
 				//body {max-width: 95%; font-size: 100%; line-height: 100%;}
 				div.Gallery {background-color:rgb(255,248,248); }	
 				div.TOC {background-color:rgb(248,248,255); }	
+				//div.main, .r {font-family: monospace; white-space: pre; max-width: 1000px}
 				div.r {font-family: monospace; white-space: pre; max-width: 1000px}
 				//p{margin-bottom:2%; margin-top:2%;margin-before: 2%; margin-after: 2%;}
 				code {border: 0px}
@@ -697,12 +694,13 @@ cl("e.src= " + e.src);
 		imgFold= '<img src="" alt="-" class="fold" />'
 		
 		
-		if (`split <pre> fold divs`<- 0) {
+		if (`split fold divs`<- 0) {
 			s1= ifelse(depth!= 0, gsub('^(<span id=.sp(\\d+)[^#]*\\{[^\\{\\}]*)'
-							, '\\1 <a href="javascript:ToggleFold(\\2)" id="asp\\2"><img src="" alt="-" class="fold" /></a></code></pre><div class="D-fold" id="D\\2" ><pre><code class="r div">', s1), s1)
+							, '\\1 <a href="javascript:ToggleFold(\\2)" id="asp\\2"><img src="" alt="-" class="fold" /></a>
+									</code></pre><div class="D-fold" id="D\\2"><pre><code class="r div">', s1), s1)
 			
 			s1= gsub('^(.* class="H(\\d)".* id="(\\d+).*)D-fold(.*) class="D-fold"' , '\\1D\\3\\4 class="D\\2" id="D\\3"', s1)
-			s1= ifelse(depth!= 0, gsub('([^#\\{\\}]*)\\}', '\\1<b>}</b></code></pre></div class="D-fold" ><pre><code class="r fold">', s1), s1)
+			s1= ifelse(depth!= 0, gsub('([^#\\{\\}]*)\\}', '\\1<b>}</b></code></pre></div><pre><code class="r fold">', s1), s1)
 			
 		}else{
 #			s1= ifelse(depth!= 0, gsub('^(<span id=.sp(\\d+)[^#]*\\{[^\\{\\}]*)'
@@ -985,7 +983,7 @@ if (0) {
 ### Functions for CreateNewProj
 
 #' sub ... in file, used by CreateProj =
-fsub= function(fin="M:/83_ScopeR/AegisCustomDataSourceView.script"
+fsub= function(fin= get.theFile()
 		, fout= gsub('$', '-copy$', fin)
 		, fileShow= F, overOut= T
 		, ...){

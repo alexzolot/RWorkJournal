@@ -1,13 +1,13 @@
 \name{onWin}
 \alias{onWin}
 \docType{data}
-\title{
+\title{ Function onWin..
 %%   ~~ data name/kind ... ~~
 }
 \description{
 %%  ~~ A concise (1-5 lines) description of the dataset. ~~
 }
-\usage{data(onWin)}
+\usage{data("onWin")}
 \format{
   The format is:
  logi TRUE

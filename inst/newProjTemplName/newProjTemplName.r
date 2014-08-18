@@ -2,6 +2,10 @@
 # Project  : newProjTemplName
 # File     : newProjTemplName/newProjTemplName.r
 # Author   : Alex Zolotoviski
+=======
+# Project  : newProjTemplName
+# File     : newProjTemplName/newProjTemplName.r
+# Author   : Alex Zolotoviski, alex@zolot.us
 # Created  : 00-00-00
 # License  : GPL-2
 ###############################################################################
@@ -18,12 +22,26 @@
 	library(HaLaP)
 	library(WorkJournal)
 	
-	if(fromSrc <- 1) source('m:/50_HLP/out/packages/HaLaP/inst/rcode/HLP.r') # T:/work/UseR-2013/lib/zBase0.r
 	if(fromSrc <- 1) source('m:/50_HLP/out/packages/RWorkJournal/inst/rcode/RWJ.r') # T:/work/UseR-2013/lib/zCode.r
 
 	
 	#source(file.path(root, 'lib/zBase0.r'))  
 	source('T:/work/UseR-2013/lib/zBase1.r')   # xxx: hard coded path to zBase.r
+=======
+	options(error= NULL) # options(error= recover) options(error=dump)
+	options(datatable.print.nrows=200)
+
+
+	onWin= Sys.getenv('R_PLATFORM')==''
+	if(onWin){root= 'M:'; 	memory.limit(size=9000)}  else root= '/home/azolotovitski/work'   # memory.limit()
+	
+	library(HaLaP)  # it loads libras SOAR, data.table
+	library(RWorkJournal)
+	
+	#source(file.path(root, 'lib/zBase0.r'))  
+	source('T:/work/UseR-2013/lib/zBase0.r')  # or hard coded paths to source files
+	source('T:/work/UseR-2013/lib/zBase1.r')  
+>>>>>>> 92cf8c4cdf94c5f6bafd7725a658ceee23adcbf1
 	source('T:/work/UseR-2013/lib/zCode.r')  
 	source('T:/work/UseR-2013/lib/zStats.r')  
 	source('M:/newProjTemplName/newProjTemplName.fun.r')  
@@ -42,6 +60,8 @@
 	#	setDefaults(symbols, inc=.15)
 	#libra(randomForest)
 	#libra(plotrix)  # addtable2plot
+	#libra(Cairo);  
+
 	
 	#libra(ggplot2)
 	#libra(scales)
@@ -50,23 +70,25 @@
 	proot= fp(root, 'newProjTemplName')  # project root
 	sw(fp(proot, 'out'))
 	
-	#libra(Cairo);  
 		
 	theFile= fp(proot, 'newProjTemplName.r')
 	
+=======
+        options(theFile= theFile)
 	sg.bak= sg    # ; sg=dummy ; # sa= sa.bak   # to rerun w/o change images
 	sgg.bak= sgg  # ; sgg=dummy; # sa= sa.bak   # to rerun w/o change images
 	sa.bak= sa    # ; sa=dummy ; # sa= sa.bak   # to rerun w/o change images
 	saa.bak= saa  # ; saa=dummy; # sa= sa.bak   # to rerun w/o change images
-
-	# rmDF(); gff('saved'); loo(); lo(); lsDF(); dett(); gw(); tables(); loo('xx'); loo('evs')
+=======
+					
+	# rmDF(); gff('saved'); loo(); lo(); lsDF(); dett(); gw(); taa(); loo()
 } #--
 ##########################################################
 '
+=======
 #   newProjTemplName  
-'
 
-if(0){#==  Data Inventory  ==
+if(0){##  Data Inventory  ==
 	gw() 
 	dir() # expl() 
 }
